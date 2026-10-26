@@ -1,0 +1,1012 @@
+{
+  "rows": [
+    {
+      "stage": 1,
+      "bot": "idle",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 14121.600000000011,
+      "avgCollapses": 0,
+      "avgBigFloods": 0,
+      "disasterRuns": 0,
+      "runs": 2,
+      "avgContract": 0.7397260273972603
+    },
+    {
+      "stage": 1,
+      "bot": "empty",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 22639.773254191176,
+      "avgCollapses": 0,
+      "avgBigFloods": 0,
+      "disasterRuns": 0,
+      "runs": 2,
+      "avgContract": 0.7420091324200914
+    },
+    {
+      "stage": 1,
+      "bot": "fill",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 968.9274999999978,
+      "avgCollapses": 2,
+      "avgBigFloods": 1,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.7054794520547946
+    },
+    {
+      "stage": 1,
+      "bot": "heuristic",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 2482.3660710314703,
+      "avgCollapses": 0,
+      "avgBigFloods": 0,
+      "disasterRuns": 0,
+      "runs": 2,
+      "avgContract": 0.684931506849315
+    },
+    {
+      "stage": 2,
+      "bot": "idle",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 1153.1249999998017,
+      "avgCollapses": 0,
+      "avgBigFloods": 7,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.38310502283105025
+    },
+    {
+      "stage": 2,
+      "bot": "empty",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 276.440300777595,
+      "avgCollapses": 8.5,
+      "avgBigFloods": 6,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.3554794520547945
+    },
+    {
+      "stage": 2,
+      "bot": "fill",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 2,
+      "avgCollapses": 3,
+      "avgBigFloods": 10,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.3038812785388128
+    },
+    {
+      "stage": 2,
+      "bot": "heuristic",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 2842.3232030769727,
+      "avgCollapses": 0,
+      "avgBigFloods": 7.5,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.36118721461187214
+    },
+    {
+      "stage": 3,
+      "bot": "idle",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 4970.6875000000055,
+      "avgCollapses": 0,
+      "avgBigFloods": 11,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.730593607305936
+    },
+    {
+      "stage": 3,
+      "bot": "empty",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 1233.658318537497,
+      "avgCollapses": 10.5,
+      "avgBigFloods": 8,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.7164383561643836
+    },
+    {
+      "stage": 3,
+      "bot": "fill",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 2810.687500000001,
+      "avgCollapses": 4,
+      "avgBigFloods": 15,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.7029680365296804
+    },
+    {
+      "stage": 3,
+      "bot": "heuristic",
+      "avgStars": 1,
+      "minStars": 1,
+      "maxStars": 1,
+      "avgFunds": 1975.796473119573,
+      "avgCollapses": 0,
+      "avgBigFloods": 16.5,
+      "disasterRuns": 2,
+      "runs": 2,
+      "avgContract": 0.3917808219178082
+    }
+  ],
+  "runs": [
+    {
+      "stage": 1,
+      "seed": 11,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 14070.375000000011,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.7351598173515982,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 6.1390373380000005,
+      "income": {
+        "power": 0,
+        "contract": 3220,
+        "tourism": 0,
+        "tax": 2430.3749999999977,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 0,
+        "penalty": 580
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 22,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 14172.825000000012,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.7442922374429224,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 6.190333369999999,
+      "income": {
+        "power": 0,
+        "contract": 3260,
+        "tourism": 0,
+        "tax": 2472.8249999999985,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 0,
+        "penalty": 560
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 11,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 890.8999999999098,
+        "targetFunds": 34000,
+        "totalDamage": 254124.80000001844,
+        "collapses": 0,
+        "bigFloods": 8,
+        "reliefCount": 8,
+        "emergencyCount": 3897,
+        "contractRate": 0.4,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 11.313916675,
+      "income": {
+        "power": 0,
+        "contract": 3504,
+        "tourism": 0,
+        "tax": 1312.5489473684183,
+        "relief": 29432.920000000006,
+        "emergency": 212394.23105263407
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 254124.80000006434,
+        "penalty": 2628
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 22,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 1415.3499999996939,
+        "targetFunds": 34000,
+        "totalDamage": 277035.00000002363,
+        "collapses": 0,
+        "bigFloods": 6,
+        "reliefCount": 6,
+        "emergencyCount": 4971,
+        "contractRate": 0.36621004566210047,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 21.103749677999996,
+      "income": {
+        "power": 0,
+        "contract": 3208,
+        "tourism": 0,
+        "tax": 1221.2413931888527,
+        "relief": 24000,
+        "emergency": 241797.1086068185
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 277034.99999997974,
+        "penalty": 2776
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 11,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 4881.200000000007,
+        "targetFunds": 42000,
+        "totalDamage": 139850.99999999953,
+        "collapses": 0,
+        "bigFloods": 10,
+        "reliefCount": 10,
+        "emergencyCount": 1816,
+        "contractRate": 0.7328767123287672,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 12.519688466,
+      "income": {
+        "power": 0,
+        "contract": 6420,
+        "tourism": 0,
+        "tax": 2227.155681818178,
+        "relief": 27004.08,
+        "emergency": 97250.96431818185
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 139851.00000000003,
+        "penalty": 1170
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 22,
+      "bot": "idle",
+      "result": {
+        "finished": true,
+        "funds": 5060.175000000004,
+        "targetFunds": 42000,
+        "totalDamage": 146904.40000000084,
+        "collapses": 0,
+        "bigFloods": 12,
+        "reliefCount": 12,
+        "emergencyCount": 1872,
+        "contractRate": 0.728310502283105,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 19.119467254000003,
+      "income": {
+        "power": 0,
+        "contract": 6380,
+        "tourism": 0,
+        "tax": 2218.857954545451,
+        "relief": 28889.520000000004,
+        "emergency": 102666.19704545524
+      },
+      "expense": {
+        "build": 0,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 0,
+        "damage": 146904.40000000285,
+        "penalty": 1190
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 11,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 22643.387964502894,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.7388127853881279,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 7.030435193000001,
+      "income": {
+        "power": 8287.812964503,
+        "contract": 3236,
+        "tourism": 10850,
+        "tax": 2443.5749999999985,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 5800,
+        "upgrade": 0,
+        "repair": 602,
+        "upkeep": 4200,
+        "damage": 0,
+        "penalty": 572
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 22,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 22636.158543879457,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.7452054794520548,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 7.130546966,
+      "income": {
+        "power": 8045.283543879389,
+        "contract": 3264,
+        "tourism": 11010,
+        "tax": 2476.8749999999986,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 5800,
+        "upgrade": 0,
+        "repair": 602,
+        "upkeep": 4200,
+        "damage": 0,
+        "penalty": 558
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 11,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 452.9705869041806,
+        "targetFunds": 34000,
+        "totalDamage": 273503.80000003043,
+        "collapses": 9,
+        "bigFloods": 6,
+        "reliefCount": 6,
+        "emergencyCount": 9348,
+        "contractRate": 0.36712328767123287,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 12.433860678999999,
+      "income": {
+        "power": 11725.739881219615,
+        "contract": 3216,
+        "tourism": 10880,
+        "tax": 1147.879040247677,
+        "relief": 24000,
+        "emergency": 248339.15166543695
+      },
+      "expense": {
+        "build": 27280,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 6300,
+        "damage": 273503.79999997816,
+        "penalty": 2772
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 22,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 99.91001465100939,
+        "targetFunds": 34000,
+        "totalDamage": 301515.00000004267,
+        "collapses": 8,
+        "bigFloods": 6,
+        "reliefCount": 6,
+        "emergencyCount": 13235,
+        "contractRate": 0.34383561643835614,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 22.801434983000004,
+      "income": {
+        "power": 10623.456793839096,
+        "contract": 3012,
+        "tourism": 5790,
+        "tax": 1017.1144272445825,
+        "relief": 24000,
+        "emergency": 280666.3387935708
+      },
+      "expense": {
+        "build": 25320,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 6300,
+        "damage": 301514.99999997386,
+        "penalty": 2874
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 11,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 404.35643707923464,
+        "targetFunds": 42000,
+        "totalDamage": 205299.20000000158,
+        "collapses": 10,
+        "bigFloods": 9,
+        "reliefCount": 9,
+        "emergencyCount": 2580,
+        "contractRate": 0.7141552511415525,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 14.216559330999997,
+      "income": {
+        "power": 16970.35550611484,
+        "contract": 6256,
+        "tourism": 12620,
+        "tax": 2160.899999999996,
+        "relief": 27000,
+        "emergency": 175401.30093096453
+      },
+      "expense": {
+        "build": 32780,
+        "upgrade": 0,
+        "repair": 5273,
+        "upkeep": 8400,
+        "damage": 205299.20000000394,
+        "penalty": 1252
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 22,
+      "bot": "empty",
+      "result": {
+        "finished": true,
+        "funds": 2062.9601999957595,
+        "targetFunds": 42000,
+        "totalDamage": 206540.40000000206,
+        "collapses": 11,
+        "bigFloods": 7,
+        "reliefCount": 7,
+        "emergencyCount": 2736,
+        "contractRate": 0.7187214611872146,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 20.262688412000003,
+      "income": {
+        "power": 13626.22374840477,
+        "contract": 6296,
+        "tourism": 8090,
+        "tax": 2182.568181818179,
+        "relief": 25000,
+        "emergency": 186880.56826977243
+      },
+      "expense": {
+        "build": 36840,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 8400,
+        "damage": 206540.39999999767,
+        "penalty": 1232
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 11,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 967.4149999999981,
+        "targetFunds": 26000,
+        "totalDamage": 5308.999999999999,
+        "collapses": 2,
+        "bigFloods": 1,
+        "reliefCount": 1,
+        "emergencyCount": 83,
+        "contractRate": 0.7022831050228311,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 6.460052130999999,
+      "income": {
+        "power": 0,
+        "contract": 3076,
+        "tourism": 190,
+        "tax": 1496.3999999999996,
+        "relief": 3151.4399999999996,
+        "emergency": 4314.575000000001
+      },
+      "expense": {
+        "build": 8000,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 6300,
+        "damage": 5308.999999999999,
+        "penalty": 652
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 22,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 970.4399999999976,
+        "targetFunds": 26000,
+        "totalDamage": 5177.800000000001,
+        "collapses": 2,
+        "bigFloods": 1,
+        "reliefCount": 1,
+        "emergencyCount": 81,
+        "contractRate": 0.708675799086758,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 6.5849948519999995,
+      "income": {
+        "power": 0,
+        "contract": 3104,
+        "tourism": 220,
+        "tax": 1535.6249999999993,
+        "relief": 3063.84,
+        "emergency": 4162.775000000001
+      },
+      "expense": {
+        "build": 8000,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 6300,
+        "damage": 5177.800000000001,
+        "penalty": 638
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 11,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 4,
+        "targetFunds": 34000,
+        "totalDamage": 289671.6000000279,
+        "collapses": 3,
+        "bigFloods": 11,
+        "reliefCount": 11,
+        "emergencyCount": 6543,
+        "contractRate": 0.3223744292237443,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 11.385602731,
+      "income": {
+        "power": 0,
+        "contract": 2824,
+        "tourism": 140,
+        "tax": 484.87500000000034,
+        "relief": 41432.920000000006,
+        "emergency": 256301.80500001452
+      },
+      "expense": {
+        "build": 11200,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 8340,
+        "damage": 289671.5999999825,
+        "penalty": 2968
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 22,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 0,
+        "targetFunds": 34000,
+        "totalDamage": 311561.8000000419,
+        "collapses": 3,
+        "bigFloods": 9,
+        "reliefCount": 9,
+        "emergencyCount": 7320,
+        "contractRate": 0.2853881278538813,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 21.660686029000004,
+      "income": {
+        "power": 0,
+        "contract": 2500,
+        "tourism": 190,
+        "tax": 419.4750000000003,
+        "relief": 35969.479999999996,
+        "emergency": 284152.8450000149
+      },
+      "expense": {
+        "build": 11200,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 8340,
+        "damage": 311561.7999999793,
+        "penalty": 3130
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 11,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 2721.2000000000025,
+        "targetFunds": 42000,
+        "totalDamage": 159417.9999999999,
+        "collapses": 4,
+        "bigFloods": 13,
+        "reliefCount": 13,
+        "emergencyCount": 3107,
+        "contractRate": 0.7105022831050228,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 12.546190785999999,
+      "income": {
+        "power": 0,
+        "contract": 6224,
+        "tourism": 0,
+        "tax": 1420.9124999999988,
+        "relief": 34926.76,
+        "emergency": 138135.52750000005
+      },
+      "expense": {
+        "build": 18000,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 12300,
+        "damage": 159418.00000000015,
+        "penalty": 1268
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 22,
+      "bot": "fill",
+      "result": {
+        "finished": true,
+        "funds": 2900.1749999999997,
+        "targetFunds": 42000,
+        "totalDamage": 168097.20000000112,
+        "collapses": 4,
+        "bigFloods": 17,
+        "reliefCount": 17,
+        "emergencyCount": 2901,
+        "contractRate": 0.6954337899543379,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 19.63831554999999,
+      "income": {
+        "power": 0,
+        "contract": 6092,
+        "tourism": 0,
+        "tax": 1337.7204545454538,
+        "relief": 38789.520000000004,
+        "emergency": 143412.1345454566
+      },
+      "expense": {
+        "build": 18000,
+        "upgrade": 0,
+        "repair": 0,
+        "upkeep": 12300,
+        "damage": 168097.20000000077,
+        "penalty": 1334
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 11,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 3262.9588212797207,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.7004566210045662,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 9.145257397,
+      "income": {
+        "power": 15843.358821279766,
+        "contract": 3068,
+        "tourism": 10800,
+        "tax": 2037.6000000000001,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 11600,
+        "upgrade": 20790,
+        "repair": 0,
+        "upkeep": 4440,
+        "damage": 0,
+        "penalty": 656
+      }
+    },
+    {
+      "stage": 1,
+      "seed": 22,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 1701.7733207832198,
+        "targetFunds": 26000,
+        "totalDamage": 0,
+        "collapses": 0,
+        "bigFloods": 0,
+        "reliefCount": 0,
+        "emergencyCount": 0,
+        "contractRate": 0.6694063926940639,
+        "stars": 1
+      },
+      "disaster": false,
+      "seconds": 8.137718589000002,
+      "income": {
+        "power": 15227.473320783134,
+        "contract": 2932,
+        "tourism": 10050,
+        "tax": 1806.2999999999993,
+        "relief": 0,
+        "emergency": 0
+      },
+      "expense": {
+        "build": 11600,
+        "upgrade": 20790,
+        "repair": 0,
+        "upkeep": 4200,
+        "damage": 0,
+        "penalty": 724
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 11,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 2609.083970895382,
+        "targetFunds": 34000,
+        "totalDamage": 253227.20000000505,
+        "collapses": 0,
+        "bigFloods": 8,
+        "reliefCount": 8,
+        "emergencyCount": 3322,
+        "contractRate": 0.3821917808219178,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 12.68588704,
+      "income": {
+        "power": 15778.506774683181,
+        "contract": 3348,
+        "tourism": 5240,
+        "tax": 1111.3878018575842,
+        "relief": 28515.359999999993,
+        "emergency": 208429.02939435406
+      },
+      "expense": {
+        "build": 4800,
+        "upgrade": 5880,
+        "repair": 0,
+        "upkeep": 4200,
+        "damage": 253227.2000000636,
+        "penalty": 2706
+      }
+    },
+    {
+      "stage": 2,
+      "seed": 22,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 3075.5624352585633,
+        "targetFunds": 34000,
+        "totalDamage": 283372.8000000247,
+        "collapses": 0,
+        "bigFloods": 7,
+        "reliefCount": 7,
+        "emergencyCount": 3857,
+        "contractRate": 0.3401826484018265,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 24.382860623000003,
+      "income": {
+        "power": 15257.826310570365,
+        "contract": 2980,
+        "tourism": 4080,
+        "tax": 892.5391486068125,
+        "relief": 25835.88,
+        "emergency": 245529.1169760809
+      },
+      "expense": {
+        "build": 4800,
+        "upgrade": 6720,
+        "repair": 517,
+        "upkeep": 4200,
+        "damage": 283372.79999997746,
+        "penalty": 2890
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 11,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 2017.6529306381829,
+        "targetFunds": 42000,
+        "totalDamage": 302917.0000000171,
+        "collapses": 0,
+        "bigFloods": 16,
+        "reliefCount": 16,
+        "emergencyCount": 11743,
+        "contractRate": 0.3963470319634703,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 14.395888971,
+      "income": {
+        "power": 8407.600777503101,
+        "contract": 3472,
+        "tourism": 3000,
+        "tax": 977.9181818181822,
+        "relief": 52287.95999999999,
+        "emergency": 240114.1739713155
+      },
+      "expense": {
+        "build": 4800,
+        "upgrade": 4200,
+        "repair": 481,
+        "upkeep": 4200,
+        "damage": 302917.00000002905,
+        "penalty": 2644
+      }
+    },
+    {
+      "stage": 3,
+      "seed": 22,
+      "bot": "heuristic",
+      "result": {
+        "finished": true,
+        "funds": 1933.9400156009629,
+        "targetFunds": 42000,
+        "totalDamage": 305856.0000000134,
+        "collapses": 0,
+        "bigFloods": 17,
+        "reliefCount": 17,
+        "emergencyCount": 11951,
+        "contractRate": 0.3872146118721461,
+        "stars": 1
+      },
+      "disaster": true,
+      "seconds": 21.165495903999997,
+      "income": {
+        "power": 8291.732561151324,
+        "contract": 3392,
+        "tourism": 2940,
+        "tax": 990.9443181818187,
+        "relief": 53629.00000000001,
+        "emergency": 241911.26313626688
+      },
+      "expense": {
+        "build": 4800,
+        "upgrade": 4200,
+        "repair": 481,
+        "upkeep": 4200,
+        "damage": 305856.00000001374,
+        "penalty": 2684
+      }
+    }
+  ],
+  "failures": [
+    "스테이지 1: 휴리스틱 봇 평균 별 1.00 < 2",
+    "스테이지 1: 휴리스틱 봇이 ★★★를 한 번도 못 받았다",
+    "스테이지 1: idle 봇 점수가 휴리스틱보다 높다",
+    "스테이지 1: empty 봇 점수가 휴리스틱보다 높다",
+    "스테이지 2: 휴리스틱 봇 평균 별 1.00 < 2",
+    "스테이지 3: 휴리스틱 봇 평균 별 1.00 < 2",
+    "스테이지 3: idle 봇 점수가 휴리스틱보다 높다",
+    "스테이지 3: fill 봇 점수가 휴리스틱보다 높다"
+  ]
+}

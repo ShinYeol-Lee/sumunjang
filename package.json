@@ -12,7 +12,8 @@
     "test": "vitest run",
     "e2e": "playwright test",
     "bots": "vite-node src/bots/run.ts",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run e2e && npm run bots"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run e2e && npm run bots",
+    "build:pages": "tsc --noEmit && vite build --outDir docs --emptyOutDir && touch docs/.nojekyll"
   },
   "dependencies": {
     "idb": "^8.0.4",

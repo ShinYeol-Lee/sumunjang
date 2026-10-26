@@ -14,6 +14,16 @@ npm run build    # 배포용 빌드 (dist/)
 npm run check    # 타입체크 + 린트 + 단위 + 빌드 + E2E + 밸런스 봇 (약 10분)
 ```
 
+## 웹에서 바로 하기 (핸드폰 포함)
+
+GitHub Pages로 `docs/` 폴더를 그대로 서비스합니다.
+
+1. 저장소 **Settings → Pages**에서 Source를 **Deploy from a branch**로 두고, 브랜치와 폴더 `/docs`를 고릅니다.
+2. 1~2분 뒤 https://shinyeol-lee.github.io/sumunjang/ 에서 열립니다.
+3. 핸드폰은 사파리·크롬 같은 브라우저로 열고 가로로 돌려서 합니다.
+
+게임을 고친 뒤에는 `npm run build:pages`로 `docs/`를 다시 만들어 커밋합니다.
+
 ## 조작
 
 | 동작 | 마우스 | 터치 |

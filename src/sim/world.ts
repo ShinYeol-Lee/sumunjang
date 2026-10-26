@@ -465,7 +465,8 @@ export class World {
     w.towns = structuredClone(save.towns);
     w.economy = structuredClone(save.economy);
     w.weather = new Weather(w.stage, w.seed, save.weather);
-    w.today = w.weather.today(Math.floor(w.tick / TIME.TICKS_PER_DAY));
+    // 원본과 똑같은 상태가 되도록 스케줄을 건드리지 않고 첫 날을 그대로 쓴다
+    w.today = w.weather.state.schedule[0];
     w.alerts = { ...save.alerts };
     w.result = save.result ? { ...save.result } : null;
     return w;

@@ -89,10 +89,17 @@ export async function readCodex(): Promise<Partial<Record<CodexId, CodexEntry>>>
   return ((await (await db()).get('meta', 'codex')) as Partial<Record<CodexId, CodexEntry>>) ?? {};
 }
 
-export async function unlockCodex(entry: CodexEntry): Promise<boolean> {
-  const all = await readCodex();
-  if (all[entry.id]) return false;
-  all[entry.id] = entry;
-  await (await db()).put('meta', all, 'codex');
-  return true;
+let codexChain: Promise<unknown> = Promise.resolve();
+
+/** 도감 해금. 동시에 여러 개가 와도 읽고-쓰기가 겹치지 않게 차례로 처리한다 */
+export function unlockCodex(entry: CodexEntry): Promise<boolean> {
+  const run = codexChain.then(async () => {
+    const all = await readCodex();
+    if (all[entry.id]) return false;
+    all[entry.id] = entry;
+    await (await db()).put('meta', all, 'codex');
+    return true;
+  });
+  codexChain = run.catch(() => false);
+  return run;
 }

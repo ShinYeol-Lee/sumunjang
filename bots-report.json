@@ -175,7 +175,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.674833991,
+      "seconds": 6.995984443,
       "income": {
         "power": 0,
         "contract": 2616,
@@ -210,7 +210,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 5.776536891999999,
+      "seconds": 5.955059555999999,
       "income": {
         "power": 0,
         "contract": 2592,
@@ -245,7 +245,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.3328638810000015,
+      "seconds": 6.881652218999999,
       "income": {
         "power": 0,
         "contract": 2595,
@@ -280,7 +280,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 5.607710338,
+      "seconds": 6.071270574000002,
       "income": {
         "power": 0,
         "contract": 2541,
@@ -315,7 +315,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 5.516694171999999,
+      "seconds": 5.837130651,
       "income": {
         "power": 0,
         "contract": 2547,
@@ -350,7 +350,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.484430645999997,
+      "seconds": 7.5345272360000015,
       "income": {
         "power": 0,
         "contract": 5505,
@@ -385,7 +385,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.5064466990000005,
+      "seconds": 7.716440836999995,
       "income": {
         "power": 0,
         "contract": 5394,
@@ -420,7 +420,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.953738600999997,
+      "seconds": 7.670640978000003,
       "income": {
         "power": 0,
         "contract": 5685,
@@ -455,7 +455,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.431135505999999,
+      "seconds": 7.581329219,
       "income": {
         "power": 0,
         "contract": 5337,
@@ -490,7 +490,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.436337678999997,
+      "seconds": 7.953122940000001,
       "income": {
         "power": 0,
         "contract": 5460,
@@ -525,7 +525,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.542280960000003,
+      "seconds": 9.048985877,
       "income": {
         "power": 0,
         "contract": 5877,
@@ -560,7 +560,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.087802972000006,
+      "seconds": 9.146084358000007,
       "income": {
         "power": 0,
         "contract": 5898,
@@ -595,7 +595,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.314590805999993,
+      "seconds": 9.355776483000009,
       "income": {
         "power": 0,
         "contract": 5697,
@@ -630,7 +630,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.220169234999993,
+      "seconds": 9.451582651999997,
       "income": {
         "power": 0,
         "contract": 5784,
@@ -665,7 +665,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.707973583000014,
+      "seconds": 9.546818862999993,
       "income": {
         "power": 0,
         "contract": 5670,
@@ -700,7 +700,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.980667744,
+      "seconds": 6.9212236780000005,
       "income": {
         "power": 15779.751330034109,
         "contract": 2616,
@@ -735,7 +735,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.776108585,
+      "seconds": 6.654652813999999,
       "income": {
         "power": 15409.172500507977,
         "contract": 2589,
@@ -770,7 +770,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.5384493840000015,
+      "seconds": 6.898504524999998,
       "income": {
         "power": 14845.010321404148,
         "contract": 2595,
@@ -805,7 +805,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.342145104999999,
+      "seconds": 6.386298828999999,
       "income": {
         "power": 15553.946020475625,
         "contract": 2559,
@@ -840,7 +840,7 @@
         "stars": 1
       },
       "disaster": false,
-      "seconds": 6.852654582000003,
+      "seconds": 6.528975387000002,
       "income": {
         "power": 15530.367639148557,
         "contract": 2541,
@@ -875,7 +875,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.863396368999995,
+      "seconds": 8.437704288,
       "income": {
         "power": 5373.571785840184,
         "contract": 5574,
@@ -910,7 +910,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 8.074040961000007,
+      "seconds": 7.540305922,
       "income": {
         "power": 5883.489960110594,
         "contract": 5445,
@@ -945,7 +945,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 8.459214536,
+      "seconds": 8.165677337000002,
       "income": {
         "power": 16016.64068734294,
         "contract": 5694,
@@ -980,7 +980,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.664221521000007,
+      "seconds": 9.013081476000007,
       "income": {
         "power": 6982.224010934306,
         "contract": 5460,
@@ -1015,7 +1015,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.944552975999992,
+      "seconds": 8.087768045000004,
       "income": {
         "power": 9481.979868315777,
         "contract": 5550,
@@ -1050,7 +1050,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 10.226835202999995,
+      "seconds": 9.603974554999994,
       "income": {
         "power": 20011.86112461758,
         "contract": 5853,
@@ -1085,7 +1085,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 10.64096830800001,
+      "seconds": 10.112103288000013,
       "income": {
         "power": 13604.943337996197,
         "contract": 5904,
@@ -1120,7 +1120,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.777278179000001,
+      "seconds": 9.623497341999988,
       "income": {
         "power": 20196.577945364992,
         "contract": 5673,
@@ -1155,7 +1155,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 10.45931897600001,
+      "seconds": 10.196387252000001,
       "income": {
         "power": 25412.45755380314,
         "contract": 5799,
@@ -1190,7 +1190,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 10.270163654000003,
+      "seconds": 9.773752896999998,
       "income": {
         "power": 15890.54407082289,
         "contract": 5670,
@@ -1225,7 +1225,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 6.121978144,
+      "seconds": 7.1668544999999995,
       "income": {
         "power": 0,
         "contract": 2523,
@@ -1260,7 +1260,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 6.320508282,
+      "seconds": 6.416351060999999,
       "income": {
         "power": 0,
         "contract": 2499,
@@ -1295,7 +1295,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 6.387811469,
+      "seconds": 6.195701611999999,
       "income": {
         "power": 0,
         "contract": 2499,
@@ -1330,7 +1330,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 6.0067999180000005,
+      "seconds": 5.9136339950000005,
       "income": {
         "power": 0,
         "contract": 2451,
@@ -1365,7 +1365,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 5.550338352999999,
+      "seconds": 5.799061978000002,
       "income": {
         "power": 0,
         "contract": 2457,
@@ -1400,7 +1400,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.461712506999996,
+      "seconds": 7.626172996000001,
       "income": {
         "power": 0,
         "contract": 5322,
@@ -1435,7 +1435,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.763820856999999,
+      "seconds": 7.652976598000001,
       "income": {
         "power": 0,
         "contract": 5202,
@@ -1470,7 +1470,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.722169838000002,
+      "seconds": 7.074457743999999,
       "income": {
         "power": 0,
         "contract": 5505,
@@ -1505,7 +1505,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.235778381999997,
+      "seconds": 8.229934125,
       "income": {
         "power": 0,
         "contract": 5154,
@@ -1540,7 +1540,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 7.773249017999995,
+      "seconds": 7.558483609000002,
       "income": {
         "power": 0,
         "contract": 5280,
@@ -1575,7 +1575,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 10.001231746999999,
+      "seconds": 9.088218034999999,
       "income": {
         "power": 0,
         "contract": 5805,
@@ -1610,7 +1610,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.323380674,
+      "seconds": 9.221937255000011,
       "income": {
         "power": 0,
         "contract": 5826,
@@ -1645,7 +1645,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.725327390999999,
+      "seconds": 9.490001684000003,
       "income": {
         "power": 0,
         "contract": 5625,
@@ -1680,7 +1680,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.601793678999995,
+      "seconds": 8.99744903399999,
       "income": {
         "power": 0,
         "contract": 5703,
@@ -1715,7 +1715,7 @@
         "stars": 1
       },
       "disaster": true,
-      "seconds": 9.994878974999999,
+      "seconds": 9.856214634999997,
       "income": {
         "power": 0,
         "contract": 5604,
@@ -1750,7 +1750,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 12.02893485,
+      "seconds": 11.88424042,
       "income": {
         "power": 44138.386688468745,
         "contract": 2775,
@@ -1785,7 +1785,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 11.567265248,
+      "seconds": 10.570791091,
       "income": {
         "power": 43272.92733080172,
         "contract": 2691,
@@ -1820,7 +1820,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 10.147110397,
+      "seconds": 10.101541428,
       "income": {
         "power": 40532.80802842239,
         "contract": 2658,
@@ -1855,7 +1855,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 9.937733448,
+      "seconds": 10.474345801000004,
       "income": {
         "power": 44217.03359740413,
         "contract": 2727,
@@ -1890,7 +1890,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 10.609877646999994,
+      "seconds": 10.707889179999999,
       "income": {
         "power": 45251.83259748816,
         "contract": 2754,
@@ -1925,7 +1925,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 14.667398593999998,
+      "seconds": 16.029655662999996,
       "income": {
         "power": 59639.341258995766,
         "contract": 5652,
@@ -1960,7 +1960,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 14.846609280000004,
+      "seconds": 14.89609015199999,
       "income": {
         "power": 58494.609648769685,
         "contract": 5373,
@@ -1995,7 +1995,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 14.353363054,
+      "seconds": 13.728116762999997,
       "income": {
         "power": 63486.55846321842,
         "contract": 5583,
@@ -2030,7 +2030,7 @@
         "stars": 3
       },
       "disaster": false,
-      "seconds": 14.440479607999993,
+      "seconds": 13.60368376999999,
       "income": {
         "power": 65880.04850593147,
         "contract": 5559,
@@ -2065,7 +2065,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 15.21432132300001,
+      "seconds": 14.420561589000004,
       "income": {
         "power": 61660.646370316106,
         "contract": 5391,
@@ -2100,7 +2100,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 17.321346804000015,
+      "seconds": 15.556834584000011,
       "income": {
         "power": 90087.38027880248,
         "contract": 6147,
@@ -2135,7 +2135,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 16.387352145000012,
+      "seconds": 16.262266208999993,
       "income": {
         "power": 68515.80808196818,
         "contract": 6219,
@@ -2170,7 +2170,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 16.030075094,
+      "seconds": 15.170555239000008,
       "income": {
         "power": 88779.96426816798,
         "contract": 6060,
@@ -2205,7 +2205,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 16.401955021000003,
+      "seconds": 17.091579866999993,
       "income": {
         "power": 84340.92909164785,
         "contract": 6015,
@@ -2240,7 +2240,7 @@
         "stars": 2
       },
       "disaster": true,
-      "seconds": 16.25107471800002,
+      "seconds": 16.21274248799999,
       "income": {
         "power": 81702.78628673265,
         "contract": 5844,

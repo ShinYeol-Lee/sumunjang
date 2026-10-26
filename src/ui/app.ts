@@ -1,4 +1,4 @@
-import { DAM, GAME_TITLE, METHODS, TIME, UPGRADE_AXES, UPGRADE_NAMES, type MethodId, type UpgradeAxis } from '../data/balance';
+import { DAM, ECONOMY, GAME_TITLE, METHODS, TIME, TOWN, UPGRADE_AXES, UPGRADE_NAMES, type MethodId, type UpgradeAxis } from '../data/balance';
 import { CODEX, type CodexId } from '../data/codex';
 import { STAGES, getStage } from '../data/stages';
 import { Diorama } from '../render/diorama';
@@ -16,7 +16,7 @@ import {
   type SlotId,
 } from '../save/store';
 import { SEASON_NAMES, formatDate, seasonOfMonth } from '../sim/calendar';
-import { buildCost, canUpgrade, maxDurability, maxRelease, rebuildCost, repairCost, upgradeCost } from '../sim/dam';
+import { buildCost, canUpgrade, crestOf, maxDurability, maxRelease, newDam, rebuildCost, repairCost, upgradeCost, upstreamTownMargin } from '../sim/dam';
 import type { StageResult } from '../sim/scoring';
 import { World, type WorldEvent } from '../sim/world';
 
@@ -40,6 +40,9 @@ interface Cinematic {
   siteId: string;
   t: number;
   phase: number;
+  /** 연출 전 카메라 (끝나면 되돌아간다) */
+  camPos: { x: number; y: number; z: number };
+  camTarget: { x: number; y: number; z: number };
 }
 
 const won = (n: number) => `${Math.round(n).toLocaleString('ko-KR')}원`;
@@ -80,6 +83,7 @@ export class App {
   private alertsEl!: HTMLDivElement;
   private bubbleEl!: HTMLDivElement;
   private cineEl!: HTMLDivElement;
+  private townsEl!: HTMLDivElement;
   private toastTimer = 0;
   private slotsMode: 'save' | 'load' = 'load';
   private codexQueue: { id: CodexId; date: string }[] = [];
@@ -134,6 +138,7 @@ export class App {
         <button class="icon-btn" data-action="to-menu" title="메뉴로">🏠</button>
       </div>
       <div class="alerts" data-testid="alerts"></div>
+      <div class="towns" data-testid="towns"></div>
       <div class="panel hidden" data-testid="panel"></div>
       <div class="bubble hidden" data-testid="tutorial"></div>
       <div class="cine hidden"><div class="big"></div><div class="skip">아무 키나 누르면 건너뜁니다</div></div>
@@ -144,6 +149,12 @@ export class App {
     this.alertsEl = this.hud.querySelector('.alerts')!;
     this.bubbleEl = this.hud.querySelector('.bubble')!;
     this.cineEl = this.hud.querySelector('.cine')!;
+    this.townsEl = this.hud.querySelector('.towns')!;
+    this.townsEl.addEventListener('click', (e) => {
+      const id = (e.target as HTMLElement).closest<HTMLElement>('[data-town]')?.dataset.town;
+      const l = this.world.townLayouts.find((t) => t.def.id === id);
+      if (l) this.diorama.focusCell(l.def.x, l.def.y, 50);
+    });
 
     this.hud.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
@@ -316,6 +327,17 @@ export class App {
     const st = this.world.stage;
     this.hud.querySelector('[data-b=stage-tag]')!.innerHTML = `스테이지 ${st.id} · ${st.name}<small>목표 자금 ${won(st.targetFunds)}</small>`;
     this.syncTiltButton();
+    this.townsEl.innerHTML =
+      '<div class="tt">마을</div>' +
+      world.townLayouts
+        .map(
+          (l) => `<div class="town" data-town="${l.def.id}" title="눌러서 보기">
+        <div class="nm">${l.def.name} <span data-t="flood"></span></div>
+        <div class="kv"><span>신뢰도</span><div class="bar"><div data-t="trust"></div></div></div>
+        <div class="kv"><span>오늘 용수</span><div class="bar water"><div data-t="water"></div></div></div>
+      </div>`,
+        )
+        .join('');
     if (world.finished && world.result) this.showResult(world.result);
   }
 
@@ -445,6 +467,8 @@ export class App {
     const next = STAGES.find((s) => s.id === st.id + 1);
     const canNext = next && r.stars >= 1;
     this.setSpeed(0);
+    if (this.cine) this.endCinematic();
+    this.diorama.resetCamera();
     const reasons: string[] = [];
     if (r.funds < r.targetFunds) reasons.push(`목표 자금 ${won(r.targetFunds)}에 못 미쳤어요`);
     else if (r.stars < 3) {
@@ -645,7 +669,9 @@ export class App {
 
   private startCinematic(siteId: string): void {
     if (this.screen !== 'game') return;
-    this.cine = { siteId, t: 0, phase: 0 };
+    const c = this.diorama.camera.position;
+    const t = this.diorama.controls.target;
+    this.cine = { siteId, t: 0, phase: 0, camPos: { x: c.x, y: c.y, z: c.z }, camTarget: { x: t.x, y: t.y, z: t.z } };
     this.slowmo = 0.3;
     this.diorama.focusSite(siteId, 58);
     this.diorama.splash(siteId);
@@ -669,6 +695,7 @@ export class App {
   }
 
   private endCinematic(): void {
+    if (this.cine) this.diorama.tweenCamera(this.cine.camPos, this.cine.camTarget, 1.2);
     this.cine = null;
     this.slowmo = 1;
     this.hud.classList.remove('letterbox');
@@ -754,11 +781,36 @@ export class App {
     const trust = w.towns.reduce((a, t) => a + t.trust, 0) / Math.max(1, w.towns.length);
     this.setText('trust', `${trust < 40 ? '😟' : trust < 70 ? '🙂' : '😊'} ${Math.round(trust)}`);
     this.updatePanel();
+    this.updateTowns();
     this.positionBubble();
     const now = performance.now();
     const before = this.alerts.length;
     this.alerts = this.alerts.filter((a) => now - a.born < 9000);
     if (this.alerts.length !== before) this.renderAlerts();
+  }
+
+  private updateTowns(): void {
+    const w = this.world;
+    const dry = w.today.season === 'winter';
+    const hour = w.date.hour + 1;
+    w.townLayouts.forEach((l, i) => {
+      const box = this.townsEl.querySelector<HTMLElement>(`[data-town="${l.def.id}"]`);
+      if (!box) return;
+      const t = w.towns[i];
+      const trust = box.querySelector<HTMLElement>('[data-t=trust]')!;
+      trust.style.width = `${t.trust}%`;
+      trust.className = t.trust < 30 ? 'low' : t.trust < 60 ? 'mid' : '';
+      // 용수: 하루 요구량 대비 지금까지 흘려보낸 양 (시간 비례로 기대치와 비교)
+      const demand = l.def.demandPerDay * (dry ? ECONOMY.DRY_DEMAND_MULT : 1);
+      const water = box.querySelector<HTMLElement>('[data-t=water]')!;
+      const pace = t.flowToday / Math.max(1e-6, (demand * hour) / TIME.TICKS_PER_DAY);
+      water.style.width = `${Math.min(100, (t.flowToday / demand) * 100)}%`;
+      water.className = pace < 0.8 ? 'low' : '';
+      const fl = box.querySelector<HTMLElement>('[data-t=flood]')!;
+      const txt = t.floodRatio > 0 ? `🌊 침수 ${Math.round(t.floodRatio * 100)}%` : '';
+      if (fl.textContent !== txt) fl.textContent = txt;
+      box.classList.toggle('flooding', t.floodRatio >= 0.3);
+    });
   }
 
   private setText(key: string, text: string): void {
@@ -850,8 +902,13 @@ export class App {
       })
       .join('');
     const kind = s.def.kind === 'narrow' ? '좁은 협곡 — 싸지만 저수량이 작다' : '넓은 부지 — 비싸지만 저수량이 크다';
+    const w = this.world;
+    const margin = upstreamTownMargin(s, crestOf(s, newDam(s.def.id, 'stone')), w.terrain.ground, w.townLayouts, TOWN.FLOOD_DEPTH);
+    const upstreamNote = Number.isFinite(margin)
+      ? `<div class="sub">⬆ 상류에 마을이 있어요. 저수 용량을 너무 올리면 역류로 잠길 수 있어요.</div>`
+      : '';
     return `<button class="close" data-p="close">✕</button>
-      <h3>🚩 ${s.def.name}</h3><div class="sub">${kind}</div>
+      <h3>🚩 ${s.def.name}</h3><div class="sub">${kind}</div>${upstreamNote}
       <div class="section-title">공법 선택 (건설 후 바꿀 수 없음)</div>
       <div class="cards">${cards}</div>
       <div class="row"><button class="btn primary" style="flex:1" data-p="build" data-testid="build-confirm">건설하기</button></div>`;
@@ -873,7 +930,12 @@ export class App {
       const max = m.maxUpgrade;
       const pips = '●'.repeat(lvl) + '○'.repeat(Math.max(0, max - lvl));
       const can = canUpgrade(dam, a);
-      return `<div class="upg"><div>${UPGRADE_NAMES[a]} <span class="pips">${pips}</span></div>
+      let warn = '';
+      if (a === 'capacity' && can) {
+        const m = upstreamTownMargin(s, crestOf(s, dam) + DAM.CAPACITY_STEP, w.terrain.ground, w.townLayouts, TOWN.FLOOD_DEPTH);
+        if (m < 1) warn = `<div class="warn">⚠ 더 높이면 상류 마을이 역류로 잠길 수 있어요</div>`;
+      }
+      return `<div class="upg"><div>${UPGRADE_NAMES[a]} <span class="pips">${pips}</span>${warn}</div>
         <button class="btn small" data-up="${a}" data-testid="upgrade-${a}">${can ? won(upgradeCost(s.def, dam, a)) : '최대'}</button></div>`;
     }).join('');
     const auto =
@@ -970,16 +1032,6 @@ export class App {
       },
       startStage(id: number, seed: number) {
         app.startStage(id, seed);
-      },
-      info() {
-        const i = app.diorama.renderer.info;
-        return { ...i.memory, ...i.render, programs: i.programs?.length };
-      },
-      dbg(flags: Record<string, boolean>) {
-        Object.assign(app.diorama.dbg, flags);
-      },
-      debugRain(on: boolean) {
-        app.diorama.rainEnabled = on;
       },
       gfx(pixelRatio: number, shadows: boolean) {
         app.diorama.setQuality(pixelRatio, shadows);

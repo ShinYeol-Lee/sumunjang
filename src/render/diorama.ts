@@ -45,9 +45,6 @@ export class Diorama {
   private tiltH: ShaderPass;
   private tiltV: ShaderPass;
   tiltShift = false;
-  rainEnabled = true;
-  /** 개발용 토글 */
-  dbg: Record<string, boolean> = {};
 
   private world!: World;
   private W = 0;
@@ -206,6 +203,7 @@ export class Diorama {
   }
 
   resetCamera(): void {
+    this.camTween = null;
     this.controls.target.set(0, 6, 4);
     this.camera.position.set(0, 122, 106);
     this.controls.update();
@@ -736,7 +734,7 @@ export class Diorama {
   }
 
   private updateRain(dt: number, intensity: number): void {
-    this.rainLevel += ((this.rainEnabled ? Math.min(1, intensity / 2.5) : 0) - this.rainLevel) * Math.min(1, dt * 2);
+    this.rainLevel += (Math.min(1, intensity / 2.5) - this.rainLevel) * Math.min(1, dt * 2);
     const lv = this.rainLevel;
     const mat = this.rain.material as THREE.LineBasicMaterial;
     mat.opacity = lv * 0.55;
@@ -824,6 +822,17 @@ export class Diorama {
     };
   }
 
+  tweenCamera(pos: { x: number; y: number; z: number }, target: { x: number; y: number; z: number }, dur: number): void {
+    this.camTween = {
+      from: this.controls.target.clone(),
+      to: new THREE.Vector3(target.x, target.y, target.z),
+      fromPos: this.camera.position.clone(),
+      toPos: new THREE.Vector3(pos.x, pos.y, pos.z),
+      t: 0,
+      dur,
+    };
+  }
+
   focusSite(siteId: string, distance = 45): void {
     const s = this.world.sites.find((x) => x.def.id === siteId);
     if (s) this.focusCell(s.cx, s.cy, distance);
@@ -889,9 +898,9 @@ export class Diorama {
       this.season = season;
       this.paintTerrain(season);
     }
-    if (!this.dbg.noWater) this.updateWater(time);
+    this.updateWater(time);
     this.updateDams(time);
-    if (!this.dbg.noHouses) this.updateHouses(time);
+    this.updateHouses(time);
     this.updateRain(dt, this.world.today.rain);
     this.updateSplashes(dt);
     const pt1 = performance.now();
@@ -912,7 +921,6 @@ export class Diorama {
       this.camera.position.x += (Math.random() - 0.5) * a;
       this.camera.position.y += (Math.random() - 0.5) * a;
     }
-    if (this.dbg.noRender) return;
     if (this.tiltShift) this.composer.render(dt);
     else this.renderer.render(this.scene, this.camera);
     this.perf = { cpu: pt1 - pt0, draw: performance.now() - pt1 };

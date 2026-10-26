@@ -82,7 +82,7 @@ export class App {
   private cineEl!: HTMLDivElement;
   private toastTimer = 0;
   private slotsMode: 'save' | 'load' = 'load';
-  private codexQueue: CodexId[] = [];
+  private codexQueue: { id: CodexId; date: string }[] = [];
   ready = false;
   perf = { sim: 0, render: 0, hud: 0 };
 
@@ -547,15 +547,15 @@ export class App {
       switch (e.type) {
         case 'collapse':
           this.pushAlert(`💥 ${siteName} 댐이 무너졌습니다!`, '재건하려면 댐을 눌러 주세요', 'danger', e.siteId);
-          this.codexQueue.push('firstCollapse');
+          this.codexQueue.push({ id: 'firstCollapse', date: formatDate(w.date) });
           this.startCinematic(e.siteId!);
           break;
         case 'chainCollapse':
-          this.codexQueue.push('chainCollapse');
+          this.codexQueue.push({ id: 'chainCollapse', date: formatDate(w.date) });
           break;
         case 'overtopStart':
           this.pushAlert(`🌊 ${siteName} 월류 중`, '물이 댐을 넘고 있어요. 수문을 여세요!', 'danger', e.siteId);
-          this.codexQueue.push('overtop');
+          this.codexQueue.push({ id: 'overtop', date: formatDate(w.date) });
           break;
         case 'dangerLevel':
           this.pushAlert(`⚠️ ${siteName} 수위 90% 초과`, '위험 구간입니다', 'warn', e.siteId);
@@ -568,7 +568,7 @@ export class App {
           break;
         case 'bigFlood':
           this.pushAlert(`🏚️ ${townName} 대형 침수!`, '시설 30% 이상이 잠겼습니다', 'danger', undefined, e.townId);
-          this.codexQueue.push('sunkenTown');
+          this.codexQueue.push({ id: 'sunkenTown', date: formatDate(w.date) });
           break;
         case 'relief':
           this.pushAlert(`💰 복구 지원금 ${won(e.amount ?? 0)}`, '★★★ 조건에서 감점됩니다', 'info', undefined, e.townId);
@@ -578,7 +578,7 @@ export class App {
           break;
         case 'dryRiverbed':
           this.pushAlert(`🏜️ ${siteName} 강바닥이 드러났습니다`, '수위 10% 미만', 'warn', e.siteId);
-          this.codexQueue.push('dryRiverbed');
+          this.codexQueue.push({ id: 'dryRiverbed', date: formatDate(w.date) });
           break;
         case 'monthStart':
           void this.save('auto');
@@ -608,11 +608,11 @@ export class App {
   }
 
   private flushCodex(): void {
-    const ids = [...new Set(this.codexQueue)];
+    const seen = new Set<CodexId>();
+    const items = this.codexQueue.filter((q) => !seen.has(q.id) && seen.add(q.id));
     this.codexQueue = [];
     const thumb = this.captureThumb();
-    const date = formatDate(this.world.date);
-    for (const id of ids) {
+    for (const { id, date } of items) {
       void unlockCodex({ id, unlockedAt: Date.now(), dateLabel: date, stageName: this.world.stage.name, thumb })
         .then((isNew) => {
           if (isNew) {
@@ -647,7 +647,7 @@ export class App {
     if (this.screen !== 'game') return;
     this.cine = { siteId, t: 0, phase: 0 };
     this.slowmo = 0.3;
-    this.diorama.focusSite(siteId, 34);
+    this.diorama.focusSite(siteId, 58);
     this.diorama.splash(siteId);
     this.hud.classList.add('letterbox');
     const name = this.world.sites.find((s) => s.def.id === siteId)?.def.name ?? '';
@@ -663,7 +663,7 @@ export class App {
       const s = this.world.sites.find((x) => x.def.id === c.siteId)!;
       const dx = s.def.flow === 'E' ? 22 : 0;
       const dy = s.def.flow === 'S' ? 18 : s.def.flow === 'N' ? -18 : 0;
-      this.diorama.focusCell(Math.min(this.world.terrain.w - 8, s.cx + dx), s.cy + dy, 48, 2.2);
+      this.diorama.focusCell(Math.min(this.world.terrain.w - 8, s.cx + dx), s.cy + dy, 64, 2.2);
     }
     if (c.t > 4.2) this.endCinematic();
   }
@@ -1014,6 +1014,17 @@ export class App {
       skipToDay(day: number) {
         const target = day * TIME.TICKS_PER_DAY;
         app.advance(Math.max(0, target - app.world.tick));
+      },
+      /** 장마철 비 오는 날까지 빠르게 진행 */
+      skipToRain(minDay: number, minRain = 1.2) {
+        const target = minDay * TIME.TICKS_PER_DAY;
+        app.advance(Math.max(0, target - app.world.tick));
+        for (let k = 0; k < 120 && app.world.today.rain < minRain; k++) app.advance(TIME.TICKS_PER_DAY);
+        app.advance(6);
+        return app.world.today.rain;
+      },
+      selectSite(id: string | null) {
+        app.selectSite(id);
       },
       setDurability(siteId: string, v: number) {
         const d = app.world.dam(siteId);

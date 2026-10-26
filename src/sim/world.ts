@@ -129,8 +129,9 @@ export class World {
     this.grid.totalEvap = 0;
   }
 
+  /** 현재 날짜 (끝난 뒤에는 마지막 날에 머문다) */
   get date(): GameDate {
-    return tickToDate(this.tick);
+    return tickToDate(Math.min(this.tick, STAGE_TICKS - 1));
   }
 
   siteIndex(siteId: string): number {

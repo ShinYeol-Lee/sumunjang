@@ -119,8 +119,8 @@ export class World {
 
   /** 시작 시 강에 물을 흘려 둔다 (결정론적 예열) */
   private prefill(): void {
-    for (let k = 0; k < 24 * 6; k++) {
-      this.stage.rivers.forEach((r, ri) => this.grid.addInflow(this.terrain.sources[ri], 1.0 * r.inflowMult));
+    for (let k = 0; k < 24 * 14; k++) {
+      this.stage.rivers.forEach((r, ri) => this.grid.addInflow(this.terrain.sources[ri], (k < 24 * 7 ? 2.0 : 0.9) * r.inflowMult));
       for (let s = 0; s < WATER.SUBSTEPS; s++) this.grid.step();
     }
     this.grid.totalInflow = 0;

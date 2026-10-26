@@ -964,6 +964,10 @@ export class App {
       get inCinematic() {
         return app.inCinematic;
       },
+      topView() {
+        app.diorama.camera.position.set(0, 170, 1);
+        app.diorama.controls.target.set(0, 0, 0);
+      },
       startStage(id: number, seed: number) {
         app.startStage(id, seed);
       },

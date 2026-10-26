@@ -141,6 +141,7 @@ export class App {
       <div class="towns" data-testid="towns"></div>
       <div class="panel hidden" data-testid="panel"></div>
       <div class="bubble hidden" data-testid="tutorial"></div>
+      <div class="rotate-hint">📱↻ 화면을 가로로 돌려 주세요</div>
       <div class="cine hidden"><div class="big"></div><div class="skip">아무 키나 누르면 건너뜁니다</div></div>
     </div>`);
     this.screenEl = el(`<div id="screens"></div>`);
@@ -303,7 +304,9 @@ export class App {
   }
 
   startStage(stageId: number, seed?: number): void {
-    const s = seed ?? (Date.now() & 0x7fffffff);
+    // ?seed=숫자 로 날씨를 고정할 수 있다 (테스트·재현용)
+    const fromUrl = Number(new URLSearchParams(location.search).get('seed'));
+    const s = seed ?? (Number.isFinite(fromUrl) && fromUrl > 0 ? fromUrl : Date.now() & 0x7fffffff);
     this.enterGame(new World(stageId, s));
     if (stageId === 1 && !this.progress.tutorialDone) this.advanceTutorial(0);
   }
@@ -748,8 +751,13 @@ export class App {
     if (this.tutorialStep === 0) {
       const p = this.diorama.siteScreenPos(this.world.sites[0].def.id);
       if (p) {
-        b.style.left = `${Math.max(8, p.x - 30)}px`;
-        b.style.top = `${Math.max(70, p.y - b.offsetHeight - 26)}px`;
+        const maxLeft = window.innerWidth - b.offsetWidth - 8;
+        b.style.left = `${Math.max(8, Math.min(maxLeft, p.x - 30))}px`;
+        const above = p.y - b.offsetHeight - 26;
+        // 위에 자리가 없으면 깃발 아래에 둔다 (말풍선이 깃발을 가리지 않게)
+        const below = above < 70;
+        b.style.top = `${below ? p.y + 40 : above}px`;
+        b.classList.toggle('below', below);
       }
       b.classList.remove('above-none');
     } else if (this.tutorialStep === 1) {
@@ -840,6 +848,7 @@ export class App {
       this.panelKey = key;
       this.panelEl.innerHTML = dam ? this.damPanelHtml(i) : this.sitePanelHtml(i);
       this.panelEl.classList.remove('hidden');
+      this.panelEl.scrollTop = 0;
     }
     const funds = w.economy.funds;
     if (!dam) {
@@ -1071,8 +1080,9 @@ export class App {
       skipToRain(minDay: number, minRain = 1.2) {
         const target = minDay * TIME.TICKS_PER_DAY;
         app.advance(Math.max(0, target - app.world.tick));
-        for (let k = 0; k < 120 && app.world.today.rain < minRain; k++) app.advance(TIME.TICKS_PER_DAY);
+        // 하루 중 6시에 그날 비를 확인하고, 아니면 다음 날 6시로 넘어간다
         app.advance(6);
+        for (let k = 0; k < 120 && app.world.today.rain < minRain; k++) app.advance(TIME.TICKS_PER_DAY);
         return app.world.today.rain;
       },
       selectSite(id: string | null) {

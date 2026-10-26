@@ -8,7 +8,8 @@ test('6. 주요 화면 스크린샷 (메뉴·시작·건설·우기·붕괴·결
   const errors: string[] = [];
   await openGame(page, errors);
   await clearStorage(page);
-  await page.reload();
+  // 날씨를 고정해 장마철 비 오는 날이 항상 같은 날에 오게 한다
+  await page.goto('/?seed=7');
   await page.waitForFunction(() => (window as any).__game?.ready === true);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${DIR}/01-main-menu.png` });

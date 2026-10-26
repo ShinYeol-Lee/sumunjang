@@ -849,9 +849,18 @@ export class Diorama {
     this.selectRing.position.copy(this.cellToWorld(s.cx, s.cy, s.bottom + maxCrestHeight(s.def) + 0.6));
   }
 
+  /** 화면을 돌려 놓았을 때(localCoords)는 캔버스 자체 좌표계를 쓴다 */
+  localCoords = false;
+
+  private canvasRect(): { left: number; top: number; width: number; height: number } {
+    const c = this.renderer.domElement;
+    if (this.localCoords) return { left: 0, top: 0, width: c.clientWidth, height: c.clientHeight };
+    return c.getBoundingClientRect();
+  }
+
   /** 화면 좌표(픽셀)에 있는 부지 id */
   pick(clientX: number, clientY: number): string | null {
-    const rect = this.renderer.domElement.getBoundingClientRect();
+    const rect = this.canvasRect();
     const ndc = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     const ray = new THREE.Raycaster();
     ray.setFromCamera(ndc, this.camera);
@@ -865,7 +874,7 @@ export class Diorama {
     const s = this.world.sites.find((x) => x.def.id === siteId);
     if (!s) return null;
     const p = this.cellToWorld(s.cx, s.cy, s.bottom + maxCrestHeight(s.def) * 0.55 + 2.5).project(this.camera);
-    const rect = this.renderer.domElement.getBoundingClientRect();
+    const rect = this.canvasRect();
     return { x: rect.left + ((p.x + 1) / 2) * rect.width, y: rect.top + ((1 - p.y) / 2) * rect.height };
   }
 

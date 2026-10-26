@@ -45,7 +45,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
   display: flex; gap: 8px; align-items: center; padding: 6px 8px;
   background: rgba(251, 245, 234, 0.92); border-radius: 16px; box-shadow: var(--shadow);
-  white-space: nowrap; max-width: calc(100vw - 20px);
+  white-space: nowrap; max-width: calc(100% - 20px);
 }
 .chip { display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 10px; background: var(--paper-2); font-size: 14px; font-weight: 600; }
 .chip .label { color: var(--ink-soft); font-weight: 500; font-size: 12px; }
@@ -130,19 +130,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bubble.below:after { bottom: auto; top: -10px; border-top-color: transparent; border-bottom: 8px solid var(--gold); border-top: 0; }
 .bubble { pointer-events: none; }
 .bubble button { pointer-events: auto; }
-.rotate-hint { display: none; }
-@media (orientation: portrait) and (max-width: 700px) {
-  .rotate-hint {
-    display: flex; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center;
-    background: rgba(40, 30, 20, 0.82); color: #fff; font-size: 22px; font-weight: 800; text-align: center; padding: 24px;
-  }
-}
 .bubble button { margin-top: 6px; white-space: nowrap; }
 
 /* ── 화면 (메뉴 등) ── */
 .screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(239, 227, 207, 0.35); }
 .screen.dim { background: rgba(60, 45, 30, 0.45); }
-.sheet { background: rgba(251, 245, 234, 0.97); border-radius: 22px; box-shadow: var(--shadow); padding: 28px 32px; max-width: min(860px, 94vw); max-height: 92vh; overflow-y: auto; }
+.sheet { background: rgba(251, 245, 234, 0.97); border-radius: 22px; box-shadow: var(--shadow); padding: 28px 32px; max-width: min(860px, 94%); max-height: 92%; overflow-y: auto; }
 .title { font-size: 64px; font-weight: 900; letter-spacing: 6px; margin: 0; color: #2b5d6b; text-shadow: 0 3px 0 #fff, 0 6px 0 rgba(0,0,0,.08); }
 .tagline { color: var(--ink-soft); margin: 6px 0 22px; }
 .menu { display: flex; flex-direction: column; gap: 10px; min-width: 260px; }
@@ -176,37 +169,41 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cine { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); text-align: center; pointer-events: none; }
 .cine .big { font-size: 34px; font-weight: 900; color: #fff; text-shadow: 0 3px 10px rgba(0,0,0,.45); }
 .cine .skip { font-size: 13px; color: #fff; opacity: .85; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
-.letterbox:before, .letterbox:after { content: ''; position: fixed; left: 0; right: 0; height: 9vh; background: #111; z-index: 0; }
+.letterbox:before, .letterbox:after { content: ''; position: fixed; left: 0; right: 0; height: 9%; background: #111; z-index: 0; }
 .letterbox:before { top: 0; }
 .letterbox:after { bottom: 0; }
 
 .toast { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f2a24; color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; box-shadow: var(--shadow); animation: slidein .2s; }
 
-@media (max-width: 900px) {
-  .topbar { top: 6px; gap: 4px; padding: 4px; flex-wrap: wrap; justify-content: center; }
-  .chip { padding: 4px 7px; font-size: 12px; }
-  .chip .label { display: none; }
-  .panel { width: min(300px, 92vw); top: auto; bottom: 8px; right: 50%; transform: translateX(50%); max-height: 55vh; }
-  .stages { grid-template-columns: 1fr; }
-  .title { font-size: 44px; }
-  .alerts { top: 92px; width: 220px; }
-  .stage-tag { display: none; }
-  .towns { width: 180px; bottom: auto; top: 92px; left: auto; right: 8px; }
-}
+html.narrow .topbar { top: 6px; gap: 4px; padding: 4px; flex-wrap: wrap; justify-content: center; }
+html.narrow .chip { padding: 4px 7px; font-size: 12px; }
+html.narrow .chip .label { display: none; }
+html.narrow .panel { width: min(300px, 92%); top: auto; bottom: 8px; right: 50%; transform: translateX(50%); max-height: 55%; }
+html.narrow .stages { grid-template-columns: 1fr; }
+html.narrow .title { font-size: 44px; }
+html.narrow .alerts { top: 92px; width: 220px; }
+html.narrow .stage-tag { display: none; }
+html.narrow .towns { width: 180px; bottom: auto; top: 92px; left: auto; right: 8px; }
 
 /* 가로로 눕힌 폰: 높이가 낮으니 패널을 오른쪽에 세우고 지도를 가리지 않게 */
-@media (orientation: landscape) and (max-height: 500px) {
-  .topbar { left: 8px; transform: none; max-width: calc(100vw - 300px); top: 6px; }
-  .panel { top: 6px; right: 6px; bottom: auto; transform: none; width: 270px; max-height: calc(100vh - 12px); padding: 10px; font-size: 13px; }
-  .panel h3 { font-size: 16px; }
-  .gauge { height: 80px; }
-  .card { padding: 7px; }
-  .towns { top: auto; bottom: 6px; left: 6px; right: auto; width: 170px; padding: 6px 8px; }
-  .alerts { top: 96px; left: 6px; width: 210px; }
-  .bubble { max-width: 230px; font-size: 13px; }
-  .sheet { padding: 16px 20px; max-height: 96vh; }
-  .title { font-size: 40px; }
-  .menu .btn { padding: 8px 14px; font-size: 15px; }
-  .stages { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
-  .stage-card { min-height: 0; padding: 10px; }
+html.compact .topbar { left: 8px; transform: none; max-width: calc(100% - 300px); top: 6px; }
+html.compact .panel { top: 6px; right: 6px; bottom: auto; transform: none; width: 270px; max-height: calc(100% - 12px); padding: 10px; font-size: 13px; }
+html.compact .panel h3 { font-size: 16px; }
+html.compact .gauge { height: 80px; }
+html.compact .card { padding: 7px; }
+html.compact .towns { top: auto; bottom: 6px; left: 6px; right: auto; width: 170px; padding: 6px 8px; }
+html.compact .alerts { top: 96px; left: 6px; width: 210px; }
+html.compact .bubble { max-width: 230px; font-size: 13px; }
+html.compact .sheet { padding: 16px 20px; max-height: 96%; }
+html.compact .title { font-size: 40px; }
+html.compact .menu .btn { padding: 8px 14px; font-size: 15px; }
+html.compact .stages { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+html.compact .stage-card { min-height: 0; padding: 10px; }
+
+/* 가로 고정: 세로로 든 폰에서는 게임 화면을 시계 반대 방향으로 90° 돌린다 */
+html.force-landscape #root {
+  top: 0; left: 0; right: auto; bottom: auto;
+  width: var(--sh); height: var(--sw);
+  transform-origin: top left;
+  transform: rotate(-90deg) translateX(-100%);
 }

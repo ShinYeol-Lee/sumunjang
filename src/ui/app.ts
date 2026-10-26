@@ -19,6 +19,7 @@ import { SEASON_NAMES, formatDate, seasonOfMonth } from '../sim/calendar';
 import { buildCost, canUpgrade, crestOf, maxDurability, maxRelease, newDam, rebuildCost, repairCost, upgradeCost, upstreamTownMargin } from '../sim/dam';
 import type { StageResult } from '../sim/scoring';
 import { World, type WorldEvent } from '../sim/world';
+import { isRotated, setupOrientation } from './orientation';
 
 const TICKS_PER_SEC_1X = TIME.TICKS_PER_DAY / TIME.SECONDS_PER_DAY_1X;
 const SPEEDS = [0, 1, 2, 3];
@@ -97,11 +98,10 @@ export class App {
     this.diorama.setWorld(this.world);
     this.buildDom();
     this.bindInput(canvas);
-    window.addEventListener('resize', () => this.resize());
     window.addEventListener('beforeunload', () => {
       if (this.screen === 'game' || this.screen === 'result') void this.save('auto');
     });
-    this.resize();
+    setupOrientation(canvas, () => this.resize());
     (window as unknown as { __game: unknown }).__game = this.testHooks();
   }
 
@@ -141,7 +141,6 @@ export class App {
       <div class="towns" data-testid="towns"></div>
       <div class="panel hidden" data-testid="panel"></div>
       <div class="bubble hidden" data-testid="tutorial"></div>
-      <div class="rotate-hint">📱↻ 화면을 가로로 돌려 주세요</div>
       <div class="cine hidden"><div class="big"></div><div class="skip">아무 키나 누르면 건너뜁니다</div></div>
     </div>`);
     this.screenEl = el(`<div id="screens"></div>`);
@@ -220,9 +219,23 @@ export class App {
   }
 
   private resize(): void {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    this.diorama.resize(w, h);
+    // 가로 고정으로 돌린 경우에도 게임 화면(#root) 기준 크기를 쓴다
+    const root = this.diorama.renderer.domElement.parentElement!;
+    this.diorama.localCoords = isRotated();
+    this.diorama.resize(root.clientWidth || window.innerWidth, root.clientHeight || window.innerHeight);
+  }
+
+  /** #ui 기준 요소 위치 (화면을 돌려도 맞도록 offset으로 잰다) */
+  private uiRect(e: HTMLElement): { left: number; top: number; width: number; height: number; bottom: number } {
+    let left = 0;
+    let top = 0;
+    let n: HTMLElement | null = e;
+    while (n && n !== this.ui) {
+      left += n.offsetLeft;
+      top += n.offsetTop;
+      n = n.offsetParent as HTMLElement | null;
+    }
+    return { left, top, width: e.offsetWidth, height: e.offsetHeight, bottom: top + e.offsetHeight };
   }
 
   private toast(msg: string): void {
@@ -751,7 +764,7 @@ export class App {
     if (this.tutorialStep === 0) {
       const p = this.diorama.siteScreenPos(this.world.sites[0].def.id);
       if (p) {
-        const maxLeft = window.innerWidth - b.offsetWidth - 8;
+        const maxLeft = this.ui.clientWidth - b.offsetWidth - 8;
         b.style.left = `${Math.max(8, Math.min(maxLeft, p.x - 30))}px`;
         const above = p.y - b.offsetHeight - 26;
         // 위에 자리가 없으면 깃발 아래에 둔다 (말풍선이 깃발을 가리지 않게)
@@ -761,12 +774,12 @@ export class App {
       }
       b.classList.remove('above-none');
     } else if (this.tutorialStep === 1) {
-      const r = this.panelEl.getBoundingClientRect();
+      const r = this.uiRect(this.panelEl);
       b.style.left = `${Math.max(8, r.left - 280)}px`;
       b.style.top = `${r.top + 150}px`;
       b.classList.add('above-none');
     } else {
-      const sp = this.hud.querySelector('.speed')!.getBoundingClientRect();
+      const sp = this.uiRect(this.hud.querySelector<HTMLElement>('.speed')!);
       b.style.left = `${Math.max(8, sp.left - 40)}px`;
       b.style.top = `${sp.bottom + 14}px`;
       b.classList.add('above-none');

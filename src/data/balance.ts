@@ -30,8 +30,12 @@ export const WATER = {
   MAX_OUT_FRACTION: 0.9,
   /** 하류 출구 가상 셀의 지면 낙차 */
   OUTLET_DROP: 0.08,
-  /** 이 수심 미만의 얇은 막은 땅에 스민다(손실로 집계) */
+  /** 이 수심 미만의 얇은 막은 땅에 스민다(손실로 집계). 하도·둔치 */
   FILM_DEPTH: 0.0015,
+  /** 산비탈(둑보다 높은 땅)은 더 많이 스민다 — 국지 빗물이 한꺼번에 몰리지 않게 */
+  FILM_DEPTH_SLOPE: 0.006,
+  /** 둑보다 이만큼 높으면 산비탈로 본다 */
+  SLOPE_REL_HEIGHT: 0.6,
 };
 
 export const WEATHER = {
@@ -95,7 +99,7 @@ export const METHODS: Record<MethodId, MethodStats> = {
     baseDurability: 200,
     maxUpgrade: 3,
     decayPerTick: 0.004,
-    overtopDecayPerTick: 2.0,
+    overtopDecayPerTick: 0.6,
     powerEfficiency: 1.0,
     upkeepPerMonth: 120,
   },
@@ -105,7 +109,7 @@ export const METHODS: Record<MethodId, MethodStats> = {
     baseDurability: 400,
     maxUpgrade: 5,
     decayPerTick: 0.006,
-    overtopDecayPerTick: 1.6,
+    overtopDecayPerTick: 0.25,
     powerEfficiency: 1.35,
     upkeepPerMonth: 220,
   },
@@ -128,7 +132,7 @@ export const DAM = {
   CAPACITY_STEP: 0.45,
   /** 기본 최대 방류량 (틱당 부피) */
   BASE_RELEASE: 2.2,
-  RELEASE_PER_LEVEL: 0.5,
+  RELEASE_PER_LEVEL: 0.6,
   DURABILITY_PER_LEVEL: 0.3,
   DECAY_REDUCTION_PER_LEVEL: 0.12,
   POWER_PER_LEVEL: 0.15,
@@ -154,33 +158,35 @@ export const DAM = {
 export const TOWN = {
   FLOOD_DEPTH: { building: 0.12, road: 0.08, farm: 0.1 },
   /** 침수 시설 하나당 틱당 피해액 */
-  DAMAGE_PER_TICK: { building: 1.2, road: 0.4, farm: 0.6 },
+  DAMAGE_PER_TICK: { building: 0.15, road: 0.05, farm: 0.08 },
   START_TRUST: 70,
   /** 침수 비율 1.0일 때 틱당 신뢰도 하락 */
-  TRUST_FLOOD_PER_TICK: 1.2,
-  TRUST_RECOVER_PER_DAY: 0.15,
-  TRUST_CONTRACT_MISS: 1.5,
-  TRUST_CONTRACT_MET: 0.1,
+  TRUST_FLOOD_PER_TICK: 0.6,
+  TRUST_RECOVER_PER_DAY: 0.1,
+  TRUST_CONTRACT_MISS: 0.5,
+  TRUST_CONTRACT_MET: 0.15,
   BIG_FLOOD_RATIO: 0.3,
   BIG_FLOOD_END_RATIO: 0.1,
+  /** 침수율이 이만큼 이어서 낮아야 대형 침수가 끝난 것으로 본다 */
+  BIG_FLOOD_END_TICKS: 48,
 };
 
 export const ECONOMY = {
   /** 낙차 × 방류량 1당 발전 수입 */
-  POWER_PRICE: 0.4,
+  POWER_PRICE: 0.55,
   /** 일일 용수 계약 수입 (요구량 충족 시) */
-  CONTRACT_INCOME: 4,
+  CONTRACT_INCOME: 3,
   CONTRACT_PENALTY: 2,
   /** 건기 요구량 배수 */
   DRY_DEMAND_MULT: 1.6,
   /** 관광: 7일 변동폭 한계(만수위 비율), 최소 수위, 일 수입 */
   TOURISM_MAX_RANGE: 0.08,
-  TOURISM_MIN_LEVEL: 0.35,
+  TOURISM_MIN_LEVEL: 0.6,
   TOURISM_INCOME: 10,
   /** 신뢰도 100일 때 마을당 월 세금 */
-  TAX_PER_MONTH: 150,
+  TAX_PER_MONTH: 100,
   /** 대형 침수 후 복구 지원금 (해당 침수 피해액 대비, 상하한) */
   RELIEF_RATIO: 0.6,
-  RELIEF_MIN: 1000,
-  RELIEF_MAX: 4000,
+  RELIEF_MIN: 500,
+  RELIEF_MAX: 2500,
 };

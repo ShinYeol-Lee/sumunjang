@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { heuristicBot } from '../../src/bots/bots';
 import { STAGES } from '../../src/data/stages';
-import { maxCrestHeight } from '../../src/sim/dam';
+import { TOWN } from '../../src/data/balance';
+import { crestOf, maxCrestHeight, newDam } from '../../src/sim/dam';
 import { World } from '../../src/sim/world';
 
 describe('스테이지 데이터', () => {
@@ -22,6 +23,15 @@ describe('스테이지 데이터', () => {
         expect(l.facilities.some((f) => f.type === 'road')).toBe(true);
       }
       w.terrain.sources.forEach((cells) => expect(cells.length).toBeGreaterThan(0));
+      // 기본 높이 댐을 가득 채워도 상류 마을은 잠기지 않는다 (용량 업그레이드를 많이 하면 잠길 수 있다)
+      for (const s of w.sites) {
+        const crest = crestOf(s, newDam(s.def.id, 'stone'));
+        for (const l of w.townLayouts) {
+          if (l.def.x >= s.cx || s.def.flow !== 'E') continue;
+          const lowest = Math.min(...l.facilities.map((f) => w.terrain.ground[f.cell] + TOWN.FLOOD_DEPTH[f.type]));
+          expect(lowest).toBeGreaterThan(crest + 0.5);
+        }
+      }
       // 예열 후 하류 출구까지 물이 흐른다
       const g = w.grid;
       let edgeWet = false;

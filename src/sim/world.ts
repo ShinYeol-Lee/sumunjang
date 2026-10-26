@@ -98,6 +98,8 @@ export class World {
   events: WorldEvent[] = [];
   today: WeatherDay;
   rainScale: number;
+  /** 최근 틱의 강별 유입량 (표시·분석용) */
+  lastInflow: number[] = [];
   /** 알림 중복 방지 플래그 */
   private alerts: Record<string, boolean> = {};
 
@@ -107,6 +109,9 @@ export class World {
     this.rainScale = opts.rainScale ?? 1;
     this.terrain = generateTerrain(this.stage);
     this.grid = new WaterGrid(this.terrain.w, this.terrain.h, this.terrain.ground);
+    for (let i = 0; i < this.grid.n; i++) {
+      if (this.terrain.ground[i] - this.terrain.bankHeight[i] > WATER.SLOPE_REL_HEIGHT) this.grid.film[i] = WATER.FILM_DEPTH_SLOPE;
+    }
     this.sites = this.stage.sites.map((s, i) => computeSiteGeom(s, i, this.terrain));
     this.townLayouts = this.stage.towns.map((t) => layoutTown(t, this.terrain.w, this.terrain.h));
     this.dams = this.sites.map(() => null);
@@ -238,7 +243,8 @@ export class World {
     this.today = w.day;
     g.addRain(w.rainPerCell * this.rainScale);
     g.evaporate(w.evap);
-    this.stage.rivers.forEach((_, ri) => g.addInflow(this.terrain.sources[ri], w.inflow[ri] * this.rainScale));
+    this.lastInflow = w.inflow.map((q) => q * this.rainScale);
+    this.stage.rivers.forEach((_, ri) => g.addInflow(this.terrain.sources[ri], this.lastInflow[ri]));
 
     const active: number[] = [];
     for (let i = 0; i < this.dams.length; i++) {

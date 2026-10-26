@@ -17,6 +17,8 @@ export class WaterGrid {
   fR: Float64Array;
   fU: Float64Array;
   fD: Float64Array;
+  /** 셀별 스밈 한계 수심 */
+  film: Float64Array;
   /** 오른쪽 끝 열은 하류 출구 */
   outletRight = true;
 
@@ -39,6 +41,7 @@ export class WaterGrid {
     this.ground = ground;
     this.barrier = new Float64Array(this.n);
     this.depth = new Float64Array(this.n);
+    this.film = new Float64Array(this.n).fill(WATER.FILM_DEPTH);
     this.fL = new Float64Array(this.n);
     this.fR = new Float64Array(this.n);
     this.fU = new Float64Array(this.n);
@@ -74,13 +77,13 @@ export class WaterGrid {
   /** 증발 + 얇은 물막이 땅에 스미는 손실 */
   evaporate(perCell: number): void {
     const d = this.depth;
-    const film = WATER.FILM_DEPTH;
+    const film = this.film;
     let lost = 0;
     for (let i = 0; i < this.n; i++) {
       const v = d[i];
       if (v <= 0) continue;
       let take = perCell < v ? perCell : v;
-      if (v - take < film) {
+      if (v - take < film[i]) {
         take = v;
         this.fL[i] = 0;
         this.fR[i] = 0;

@@ -237,6 +237,26 @@ export function updateDurability(dam: DamState): boolean {
   return false;
 }
 
+/**
+ * 이 댐을 가득 채웠을 때 상류 마을까지의 여유 높이(m). 음수면 상류 마을이 잠긴다.
+ * 여유가 1m 안쪽이면 홍수 때 역류로 상류 마을이 잠기기 쉽다.
+ */
+export function upstreamTownMargin(
+  geom: SiteGeom,
+  crest: number,
+  ground: Float64Array,
+  towns: { def: { x: number }; facilities: { cell: number; type: 'building' | 'road' | 'farm' }[] }[],
+  floodDepth: Record<'building' | 'road' | 'farm', number>,
+): number {
+  let margin = Infinity;
+  if (geom.def.flow !== 'E') return margin;
+  for (const t of towns) {
+    if (t.def.x >= geom.cx) continue;
+    for (const f of t.facilities) margin = Math.min(margin, ground[f.cell] + floodDepth[f.type] - crest);
+  }
+  return margin;
+}
+
 /** 저수지 영역 저수량 */
 export function reservoirVolume(grid: WaterGrid, geom: SiteGeom): number {
   let v = 0;

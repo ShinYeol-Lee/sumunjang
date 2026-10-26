@@ -34,6 +34,8 @@ export interface TownState {
   contractDays: number;
   contractMet: number;
   wasFlooding: boolean;
+  /** 대형 침수가 끝났다고 보기 위해 낮은 침수율이 이어진 틱 수 */
+  calmTicks: number;
 }
 
 /** 강 쪽 두 줄은 농지, 그다음 줄은 큰길, 나머지는 집과 골목 */
@@ -73,6 +75,7 @@ export function newTownState(layout: TownLayout): TownState {
     contractDays: 0,
     contractMet: 0,
     wasFlooding: false,
+    calmTicks: 0,
   };
 }
 
@@ -108,7 +111,8 @@ export function updateTown(grid: WaterGrid, layout: TownLayout, st: TownState): 
   st.wasFlooding = flooded > 0;
   if (st.bigFloodActive) {
     st.bigFloodDamage += damage;
-    if (st.floodRatio < TOWN.BIG_FLOOD_END_RATIO) {
+    st.calmTicks = st.floodRatio < TOWN.BIG_FLOOD_END_RATIO ? st.calmTicks + 1 : 0;
+    if (st.calmTicks >= TOWN.BIG_FLOOD_END_TICKS) {
       st.bigFloodActive = false;
       res.bigFloodEnded = true;
       res.eventDamage = st.bigFloodDamage;

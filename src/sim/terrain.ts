@@ -162,6 +162,21 @@ export function generateTerrain(stage: StageDef): Terrain {
         ground[i] = bankHeight[i] + t.elevation + 0.035 * rowFromRiver;
       }
     }
+    // 마을과 강 사이 둔치를 강 쪽으로 내리막이 되게 깎는다 (빗물이 마을에 고이지 않게)
+    const dir = t.riverSide === 'N' ? -1 : 1;
+    for (let x = x0 - 1; x <= x0 + t.w; x++) {
+      if (x < 0 || x >= w) continue;
+      const edgeY = t.riverSide === 'N' ? y0 : y0 + t.h - 1;
+      let prev = ground[edgeY * w + x];
+      for (let k = 1; k < 20; k++) {
+        const y = edgeY + dir * k;
+        if (y < 0 || y >= h) break;
+        const i = y * w + x;
+        if (riverDist[i] < (stage.rivers[0].channelHalfWidth ?? 2)) break;
+        prev = Math.min(ground[i], prev - 0.03);
+        ground[i] = prev;
+      }
+    }
   }
 
   // 유입 셀: 경로 시작점이 닿는 격자 가장자리의 하도 셀

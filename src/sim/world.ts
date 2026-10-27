@@ -288,7 +288,14 @@ export class World {
       if (!dam) continue;
       const geom = this.sites[i];
       measureLevel(this.grid, geom, dam);
-      if (dam.status !== 'ok') continue;
+      if (dam.status !== 'ok') {
+        // 터진 곳이 넓어진다
+        if (dam.breachTicks !== undefined && dam.breachTicks < DAM.BREACH_TICKS) {
+          dam.breachTicks++;
+          applyBarrier(this.grid, geom, dam);
+        }
+        continue;
+      }
       if (dam.releasePerTick > 0) {
         dam.head = energy[i] / dam.releasePerTick;
         earn(this.economy, 'power', powerIncome(energy[i], powerEfficiency(dam)));

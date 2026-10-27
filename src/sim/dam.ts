@@ -26,6 +26,8 @@ export interface DamState {
   levelHistory: number[];
   collapses: number;
   lastCollapseTick: number;
+  /** 무너진 뒤 지난 틱 (터진 곳이 가운데서부터 넓어진다). 옛 저장에는 없을 수 있다 */
+  breachTicks?: number;
 }
 
 export interface SiteGeom {
@@ -36,6 +38,8 @@ export interface SiteGeom {
   /** 흐름 방향 셀 오프셋 */
   step: number;
   gatePairs: [number, number][];
+  /** cells 안에서 바닥 셀의 위치 (붕괴가 시작되는 곳) */
+  bottomIdx: number;
   /** 수위 측정 셀 (바닥 셀 상류 2칸) */
   refCell: number;
   /** 저수지 영역 (상류 쪽, 수위 계산·연출용) */
@@ -102,7 +106,8 @@ export function computeSiteGeom(def: DamSiteDef, index: number, terrain: Terrain
       if (ground[cc] < top) reservoirCells.push(cc);
     }
   }
-  return { def, index, cells, bottom, step, gatePairs, refCell, reservoirCells, cx: def.x, cy: def.y };
+  const bottomIdx = cells.indexOf(bottomCell);
+  return { def, index, cells, bottom, step, gatePairs, bottomIdx, refCell, reservoirCells, cx: def.x, cy: def.y };
 }
 
 export function newDam(siteId: string, method: MethodId): DamState {
@@ -166,12 +171,26 @@ export function canUpgrade(dam: DamState, axis: UpgradeAxis): boolean {
   return dam.status === 'ok' && dam.levels[axis] < METHODS[dam.method].maxUpgrade;
 }
 
+/** 무너지는 중인 댐의 셀별 남은 높이 비율 (가운데부터 터지고 양옆으로 넓어지며 전체가 깎인다) */
+export function breachFactor(geom: SiteGeom, dam: DamState, k: number): number {
+  const t = dam.breachTicks ?? DAM.BREACH_TICKS;
+  if (t >= DAM.BREACH_TICKS) return 0;
+  const width = DAM.BREACH_START + t * DAM.BREACH_WIDEN;
+  const side = Math.min(1, Math.max(0, (Math.abs(k - geom.bottomIdx) - width) / DAM.BREACH_EDGE));
+  return side * (1 - t / DAM.BREACH_TICKS);
+}
+
 export function applyBarrier(grid: WaterGrid, geom: SiteGeom, dam: DamState | null): void {
-  const crest = dam && dam.status === 'ok' ? crestOf(geom, dam) : -Infinity;
-  for (const c of geom.cells) {
-    const b = crest - grid.ground[c];
-    grid.barrier[c] = b > 0 ? b : 0;
+  if (!dam) {
+    for (const c of geom.cells) grid.barrier[c] = 0;
+    return;
   }
+  const crest = crestOf(geom, dam);
+  geom.cells.forEach((c, k) => {
+    let b = crest - grid.ground[c];
+    if (dam.status !== 'ok') b *= breachFactor(geom, dam, k);
+    grid.barrier[c] = b > 0 ? b : 0;
+  });
 }
 
 /** 이번 틱의 실제 방류율 (수동 + 자동 수문) */
@@ -231,6 +250,7 @@ export function updateDurability(dam: DamState): boolean {
   if (dam.durability <= 0) {
     dam.durability = 0;
     dam.status = 'collapsed';
+    dam.breachTicks = 0;
     dam.collapses++;
     return true;
   }

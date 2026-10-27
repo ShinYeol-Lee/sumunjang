@@ -10,9 +10,12 @@ import { maxCrestHeight } from '../sim/dam';
 import { seasonOfMonth, type Season } from '../sim/calendar';
 import { crestOf } from '../sim/dam';
 import type { World } from '../sim/world';
+import { FloodFX, type FxHouse, type FxTree } from './floodfx';
 import { COLORS, SEASON_COLORS } from './palette';
 
 const WET = 0.03;
+const MUD = new THREE.Color('#8f6a43');
+const FOAM = new THREE.Color('#f3efe6');
 /** 높이 과장 배율 (미니어처처럼 보이게) */
 export const VS = 1.3;
 
@@ -77,6 +80,17 @@ export class Diorama {
   /** 카메라 이동 애니메이션 */
   private camTween: { from: THREE.Vector3; to: THREE.Vector3; fromPos: THREE.Vector3; toPos: THREE.Vector3; t: number; dur: number } | null = null;
   pickables: THREE.Object3D[] = [];
+  /** 지금 게임 속도 (초당 틱, 멈추면 0). 떠내려가는 물건이 물살과 같은 빠르기로 움직이게 */
+  simRate = 0;
+  private fx: FloodFX | null = null;
+  private houseHidden = new Uint8Array(0);
+  private treeMatrices: THREE.Matrix4[] = [];
+  /** 연출 카메라: 지정되면 매 프레임 부드럽게 따라간다 */
+  private cineCam: { target: THREE.Vector3; pos: THREE.Vector3 } | null = null;
+  private depthSnap: Float32Array | null = null;
+  /** 셀별 흙탕물 정도: 센 물살이 지나간 뒤에도 한동안 탁하게 남는다 */
+  private turbidity = new Float32Array(0);
+  private lastWaterTime = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -197,6 +211,25 @@ export class Diorama {
     this.buildTrees();
     this.buildMarkers();
     this.buildRain();
+    this.fx?.dispose();
+    this.fx = new FloodFX({
+      world,
+      group: this.stageGroup,
+      cellToWorld: (x, y, h) => this.cellToWorld(x, y, h),
+      houses: this.houseCells.map((hc, k): FxHouse => ({
+        cell: hc.cell,
+        x: hc.x,
+        z: hc.z,
+        ground: hc.ground,
+        wall: this.houses.instanceColor ? new THREE.Color().fromArray(this.houses.instanceColor.array, k * 3) : new THREE.Color('#fff'),
+        roof: this.roofs.instanceColor ? new THREE.Color().fromArray(this.roofs.instanceColor.array, k * 3) : new THREE.Color('#c55'),
+      })),
+      trees: this.treeCells.map((cell): FxTree => ({ cell, x: cell % this.W, z: Math.floor(cell / this.W), scale: 0.7 + hash01(cell % this.W, Math.floor(cell / this.W) * 11) * 0.7 })),
+      hideHouse: (k, hidden) => (this.houseHidden[k] = hidden ? 1 : 0),
+      hideTree: (k, hidden) => this.hideTree(k, hidden),
+      smallSplash: (pos, n) => this.burst(pos, n, 0.6),
+    });
+    this.cineCam = null;
     this.sun.target.position.set(0, 0, 0);
     this.resetCamera();
     this.update(0);
@@ -399,6 +432,13 @@ export class Diorama {
     const ca = col.array as Float32Array;
     const sh = COLORS.waterShallow;
     const dp = COLORS.waterDeep;
+    const bank = this.world.terrain.bankHeight;
+    if (this.turbidity.length !== W * H) this.turbidity = new Float32Array(W * H);
+    const turb = this.turbidity;
+    // 흙탕물은 게임 시간으로 반나절쯤 지나면 가라앉는다
+    const elapsed = Math.max(0, Math.min(1, time - this.lastWaterTime));
+    this.lastWaterTime = time;
+    const settle = Math.exp(-elapsed * Math.max(0.05, this.simRate) * 0.15);
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const i = y * W + x;
@@ -435,10 +475,31 @@ export class Diorama {
         pa[i * 3] = x - W / 2 + 0.5;
         pa[i * 3 + 2] = y - H / 2 + 0.5;
         const k = Math.min(1, d / 1.6);
-        ca[i * 4] = sh.r + (dp.r - sh.r) * k;
-        ca[i * 4 + 1] = sh.g + (dp.g - sh.g) * k;
-        ca[i * 4 + 2] = sh.b + (dp.b - sh.b) * k;
-        ca[i * 4 + 3] = wet ? 0.72 + 0.23 * k : 0;
+        let r = sh.r + (dp.r - sh.r) * k;
+        let gg = sh.g + (dp.g - sh.g) * k;
+        let b = sh.b + (dp.b - sh.b) * k;
+        let a = wet ? 0.72 + 0.23 * k : 0;
+        if (wet) {
+          // 빠른 물살과 땅 위로 넘친 물은 흙탕물, 아주 빠르면 흰 거품
+          const sp = (g.fL[i] + g.fR[i] + g.fU[i] + g.fD[i]) / (d + 0.05);
+          let mud = Math.min(1, Math.max(0, (sp - 0.26) * 4));
+          if (g.ground[i] - bank[i] > -0.05 && g.barrier[i] === 0) mud = Math.max(mud, Math.min(0.85, Math.max(0, (sp - 0.04) * 6)));
+          mud = Math.max(mud, turb[i] * settle);
+          turb[i] = mud;
+          const foam = Math.min(1, Math.max(0, (sp - 0.55) * 4)) * (0.6 + 0.4 * Math.sin(x * 2.1 + y * 1.7 + time * 9));
+          r += (MUD.r - r) * mud * 0.92;
+          gg += (MUD.g - gg) * mud * 0.92;
+          b += (MUD.b - b) * mud * 0.92;
+          r += (FOAM.r - r) * foam * 0.75;
+          gg += (FOAM.g - gg) * foam * 0.75;
+          b += (FOAM.b - b) * foam * 0.75;
+          a = Math.max(a, 0.8 + 0.18 * mud);
+          if (sp > 0.3) pa[i * 3 + 1] += Math.sin(x * 2.3 + time * 11) * Math.cos(y * 1.9 + time * 8) * 0.06 * Math.min(1, sp);
+        }
+        ca[i * 4] = r;
+        ca[i * 4 + 1] = gg;
+        ca[i * 4 + 2] = b;
+        ca[i * 4 + 3] = a;
       }
     }
     pos.needsUpdate = true;
@@ -478,6 +539,7 @@ export class Diorama {
     });
     this.houses.count = n;
     this.roofs.count = n;
+    this.houseHidden = new Uint8Array(n);
     this.stageGroup.add(this.houses, this.roofs);
     this.updateHouses(0);
   }
@@ -496,6 +558,7 @@ export class Diorama {
       e.set(tilt * 0.7, hc.rot, tilt);
       q.setFromEuler(e);
       p.copy(this.cellToWorld(hc.x, hc.z, hc.ground - sink));
+      s.setScalar(this.houseHidden[k] ? 0 : 1);
       m.compose(p, q, s);
       this.houses.setMatrixAt(k, m);
       this.roofs.setMatrixAt(k, m);
@@ -529,6 +592,7 @@ export class Diorama {
       }
     }
     this.treeCells = cells;
+    this.treeMatrices = [];
     const fol = new THREE.ConeGeometry(0.55, 1.3, 6);
     fol.translate(0, 1.05, 0);
     const trunk = new THREE.CylinderGeometry(0.1, 0.13, 0.5, 5);
@@ -544,12 +608,21 @@ export class Diorama {
       const sc = 0.7 + hash01(x, y * 11) * 0.7;
       const p = this.cellToWorld(x + (hash01(x, y) - 0.5) * 0.6, y + (hash01(y, x) - 0.5) * 0.6, t.ground[cell] - 0.05);
       m.makeScale(sc, sc, sc).setPosition(p);
+      this.treeMatrices[k] = m.clone();
       this.treeFoliage.setMatrixAt(k, m);
       this.treeTrunks.setMatrixAt(k, m);
       this.treeFoliage.setColorAt(k, c);
     });
     this.treeFoliage.count = this.treeTrunks.count = cells.length;
     this.stageGroup.add(this.treeFoliage, this.treeTrunks);
+  }
+
+  private hideTree(k: number, hidden: boolean): void {
+    const m = hidden ? new THREE.Matrix4().makeScale(0, 0, 0) : this.treeMatrices[k];
+    this.treeFoliage.setMatrixAt(k, m);
+    this.treeTrunks.setMatrixAt(k, m);
+    this.treeFoliage.instanceMatrix.needsUpdate = true;
+    this.treeTrunks.instanceMatrix.needsUpdate = true;
   }
 
   private buildMarkers(): void {
@@ -605,6 +678,21 @@ export class Diorama {
     const W = this.W;
     const ground = this.world.terrain.ground;
     if (dam.status === 'collapsed') {
+      // 아직 남은 댐 조각 (터진 곳이 넓어지며 줄어든다)
+      const color = dam.method === 'earth' ? COLORS.damEarth : dam.method === 'stone' ? COLORS.damStone : COLORS.damConcrete;
+      const wallMat = new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.95 });
+      s.cells.forEach((c) => {
+        const h = this.world.grid.barrier[c];
+        if (h <= 0.05) return;
+        const x = c % W;
+        const y = Math.floor(c / W);
+        const jag = 0.75 + hash01(c, 9) * 0.25;
+        const piece = new THREE.Mesh(new THREE.BoxGeometry(0.95, h * jag * VS, dam.method === 'earth' ? 1.6 : 1.1), wallMat);
+        piece.position.copy(this.cellToWorld(x, y, ground[c] + (h * jag) / 2));
+        piece.rotation.set((hash01(c, 3) - 0.5) * 0.25, s.def.flow !== 'E' ? Math.PI / 2 : 0, (hash01(c, 4) - 0.5) * 0.25);
+        piece.castShadow = true;
+        grp.add(piece);
+      });
       const mat = new THREE.MeshStandardMaterial({ color: COLORS.rubble, flatShading: true });
       s.cells.forEach((c, k) => {
         if (hash01(c, k) > 0.6) return;
@@ -684,7 +772,9 @@ export class Diorama {
   private damKey(i: number): string {
     const d = this.world.dams[i];
     if (!d) return 'none';
-    return `${d.method}:${d.status}:${d.levels.capacity}`;
+    let b = 0;
+    if (d.status !== 'ok') for (const c of this.world.sites[i].cells) b += this.world.grid.barrier[c];
+    return `${d.method}:${d.status}:${d.levels.capacity}:${Math.round(b * 2)}`;
   }
 
   private updateDams(time: number): void {
@@ -763,6 +853,99 @@ export class Diorama {
     const bg = new THREE.Color(COLORS.background).lerp(new THREE.Color('#8f949a'), lv * 0.6);
     (this.scene.background as THREE.Color).copy(bg);
     (this.scene.fog as THREE.Fog).color.copy(bg);
+  }
+
+  /** 작은 물보라 (흙탕물이 섞인 물방울) */
+  burst(c: THREE.Vector3, n: number, power = 1): void {
+    const pos = new Float32Array(n * 3);
+    const vel = new Float32Array(n * 3);
+    for (let k = 0; k < n; k++) {
+      pos.set([c.x + (Math.random() - 0.5) * 1.2, c.y + 0.1, c.z + (Math.random() - 0.5) * 1.2], k * 3);
+      vel.set([(Math.random() - 0.5) * 5 * power, (2 + Math.random() * 5) * power, (Math.random() - 0.5) * 5 * power], k * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: Math.random() < 0.5 ? '#f2fdff' : '#c9b08a', size: 0.32, transparent: true, opacity: 0.9, depthWrite: false }));
+    this.stageGroup.add(pts);
+    this.splashes.push({ points: pts, vel, life: 1.4 });
+  }
+
+  /** 연출 시작 시점의 수심을 기억해 물마루(새로 불어난 물의 맨 앞)를 찾는다 */
+  snapshotDepth(): void {
+    this.depthSnap = Float32Array.from(this.world.grid.depth);
+  }
+
+  /** 붕괴 지점에서 하류로 가장 멀리 나아간 물마루 셀 좌표 */
+  floodFront(siteId: string): { x: number; y: number } | null {
+    const s = this.world.sites.find((x) => x.def.id === siteId);
+    const snap = this.depthSnap;
+    if (!s || !snap) return null;
+    const { W, H } = this;
+    const g = this.world.grid.depth;
+    const along = (x: number, y: number) => (s.def.flow === 'E' ? x : s.def.flow === 'S' ? y : -y);
+    const start = along(s.cx, s.cy);
+    let best = -Infinity;
+    let sx = 0;
+    let sy = 0;
+    let n = 0;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const i = y * W + x;
+        if (g[i] - snap[i] < 0.12) continue;
+        const a = along(x, y);
+        if (a <= start) continue;
+        if (a > best + 0.5) {
+          best = a;
+          sx = x;
+          sy = y;
+          n = 1;
+        } else if (a > best - 1.5) {
+          sx += x;
+          sy += y;
+          n++;
+        }
+      }
+    }
+    if (!n) return { x: s.cx, y: s.cy };
+    return { x: sx / n, y: sy / n };
+  }
+
+  /** 장난감 영상처럼 낮은 각도로, 물마루 앞쪽 옆에서 바라본다 */
+  cineLook(siteId: string, focus: { x: number; y: number }, ahead: number, side: number, height: number): void {
+    const s = this.world.sites.find((x) => x.def.id === siteId);
+    if (!s) return;
+    const dir = s.def.flow === 'E' ? [1, 0] : s.def.flow === 'S' ? [0, 1] : [0, -1];
+    const fx = focus.x;
+    const fy = focus.y;
+    const px = Math.min(this.W - 2, Math.max(1, fx + dir[0] * ahead + -dir[1] * side));
+    const py = Math.min(this.H - 2, Math.max(1, fy + dir[1] * ahead + dir[0] * side));
+    const groundAt = (x: number, y: number) => this.world.terrain.ground[Math.round(y) * this.W + Math.round(x)];
+    const target = this.cellToWorld(fx, fy, groundAt(fx, fy) + 0.6);
+    const camGround = Math.max(groundAt(px, py), groundAt(fx, fy));
+    const pos = this.cellToWorld(px, py, camGround + height);
+    this.cineCam = { target, pos };
+    this.camTween = null;
+  }
+
+  /** 셀 좌표 기준으로 카메라 위치와 바라볼 곳을 직접 정한다 */
+  cineLookAt(target: { x: number; y: number }, cam: { x: number; y: number }, height: number): void {
+    const groundAt = (x: number, y: number) =>
+      this.world.terrain.ground[Math.min(this.H - 1, Math.max(0, Math.round(y))) * this.W + Math.min(this.W - 1, Math.max(0, Math.round(x)))];
+    const cx = Math.min(this.W - 2, Math.max(1, cam.x));
+    const cy = Math.min(this.H - 2, Math.max(1, cam.y));
+    this.cineCam = {
+      target: this.cellToWorld(target.x, target.y, groundAt(target.x, target.y) + 0.5),
+      pos: this.cellToWorld(cx, cy, Math.max(groundAt(cx, cy), groundAt(target.x, target.y)) + height),
+    };
+    this.camTween = null;
+  }
+
+  endCine(): void {
+    this.cineCam = null;
+  }
+
+  get floatingCount(): number {
+    return this.fx?.floatingCount ?? 0;
   }
 
   splash(siteId: string): void {
@@ -912,6 +1095,7 @@ export class Diorama {
     this.updateHouses(time);
     this.updateRain(dt, this.world.today.rain);
     this.updateSplashes(dt);
+    this.fx?.update(dt, this.simRate, time);
     const pt1 = performance.now();
 
     if (this.camTween) {
@@ -922,6 +1106,11 @@ export class Diorama {
       this.controls.target.lerpVectors(tw.from, tw.to, e);
       this.camera.position.lerpVectors(tw.fromPos, tw.toPos, e);
       if (k >= 1) this.camTween = null;
+    }
+    if (this.cineCam) {
+      const k = 1 - Math.exp(-dt * 2.2);
+      this.controls.target.lerp(this.cineCam.target, k);
+      this.camera.position.lerp(this.cineCam.pos, k);
     }
     this.controls.update();
     if (this.shake > 0) {

@@ -106,7 +106,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bar > div { height: 100%; background: var(--ok); transition: width .2s; }
 .bar > div.low { background: var(--danger); }
 .bar > div.mid { background: var(--gold); }
-.slider { width: 100%; accent-color: var(--accent); }
+.slider { width: 100%; accent-color: var(--accent); height: 28px; }
+.stepper { display: grid; grid-template-columns: auto auto 1fr auto auto; gap: 5px; align-items: center; margin-top: 4px; }
+.stepper .btn { min-width: 40px; }
+.trend { text-align: center; font-size: 12px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.trend.up { color: var(--danger); }
+.trend.down { color: var(--accent); }
+.presets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 5px; }
+.presets .btn { padding: 5px 0; font-size: 12px; }
 .section-title { font-weight: 700; font-size: 13px; margin: 12px 0 4px; color: var(--ink-soft); }
 .upgrades { display: grid; grid-template-columns: 1fr; gap: 5px; }
 .upg { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-radius: 9px; background: var(--paper-2); font-size: 13px; }

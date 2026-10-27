@@ -151,6 +151,12 @@ export const DAM = {
   AUTO_DEFAULT_SETPOINT: 0.8,
   AUTO_BASE_OPEN: 0.6,
   AUTO_OPEN_PER_LEVEL: 0.1,
+  /** 붕괴: 이 틱 동안 터진 곳이 가운데서 양옆으로 넓어지며 댐이 다 깎인다 */
+  BREACH_TICKS: 24,
+  /** 처음 터진 폭(셀, 음수면 가운데도 조금 남음)과 틱당 넓어지는 폭, 가장자리 경사 폭 */
+  BREACH_START: -0.5,
+  BREACH_WIDEN: 0.8,
+  BREACH_EDGE: 2,
   /** 수문이 물을 끌어오는 바닥 근처 높이 범위 */
   GATE_BAND: 1.2,
 };

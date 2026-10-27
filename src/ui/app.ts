@@ -24,6 +24,9 @@ import { isRotated, setupOrientation } from './orientation';
 const TICKS_PER_SEC_1X = TIME.TICKS_PER_DAY / TIME.SECONDS_PER_DAY_1X;
 const SPEEDS = [0, 1, 2, 3];
 const MAX_TICKS_PER_FRAME = 40;
+/** 붕괴 연출 속도(1배속 대비)와 길이(실제 초) */
+const CINE_SLOWMO = 0.3;
+const CINE_SECONDS = 11;
 
 type Screen = 'menu' | 'stages' | 'game' | 'result' | 'codex' | 'slots';
 
@@ -41,12 +44,15 @@ interface Cinematic {
   siteId: string;
   t: number;
   phase: number;
+  /** 물보라를 다시 뿌릴 때까지 남은 시간 */
+  sprayT: number;
   /** 연출 전 카메라 (끝나면 되돌아간다) */
   camPos: { x: number; y: number; z: number };
   camTarget: { x: number; y: number; z: number };
 }
 
-const won = (n: number) => `${Math.round(n).toLocaleString('ko-KR')}원`;
+/** 돈은 단위 없이 숫자만 보여준다 */
+const money = (n: number) => Math.round(n).toLocaleString('ko-KR');
 
 function starsHtml(n: number, max = 3): string {
   let s = '';
@@ -293,7 +299,7 @@ export class App {
         <span class="nm">${locked ? '🔒 ' : ''}${s.name}</span>
         <span class="ds">${s.description}</span>
         <span>${starsHtml(best)}</span>
-        <span class="n">목표 자금 ${won(s.targetFunds)} · 부지 ${s.sites.length}곳</span>
+        <span class="n">목표 자금 ${money(s.targetFunds)} · 부지 ${s.sites.length}곳</span>
       </button>`;
     }).join('');
     this.setScreen(
@@ -341,7 +347,7 @@ export class App {
     this.setSpeed(0);
     this.selectSite(null);
     const st = this.world.stage;
-    this.hud.querySelector('[data-b=stage-tag]')!.innerHTML = `스테이지 ${st.id} · ${st.name}<small>목표 자금 ${won(st.targetFunds)}</small>`;
+    this.hud.querySelector('[data-b=stage-tag]')!.innerHTML = `스테이지 ${st.id} · ${st.name}<small>목표 자금 ${money(st.targetFunds)}</small>`;
     this.syncTiltButton();
     this.townsEl.innerHTML =
       '<div class="tt">마을</div>' +
@@ -390,7 +396,7 @@ export class App {
       .map((slot) => {
         const r = saves.find((x) => x.slot === slot);
         const name = slot === 'auto' ? '자동 저장' : `슬롯 ${slot.slice(4)}`;
-        const info = r ? `${r.stageName} · ${r.dateLabel} · ${won(r.funds)}<br>${new Date(r.savedAt).toLocaleString('ko-KR')}` : '비어 있음';
+        const info = r ? `${r.stageName} · ${r.dateLabel} · ${money(r.funds)}<br>${new Date(r.savedAt).toLocaleString('ko-KR')}` : '비어 있음';
         const btn =
           mode === 'save'
             ? `<button class="btn primary small" data-slot="${slot}" data-testid="save-${slot}">여기에 저장</button>`
@@ -486,7 +492,7 @@ export class App {
     if (this.cine) this.endCinematic();
     this.diorama.resetCamera();
     const reasons: string[] = [];
-    if (r.funds < r.targetFunds) reasons.push(`목표 자금 ${won(r.targetFunds)}에 못 미쳤어요`);
+    if (r.funds < r.targetFunds) reasons.push(`목표 자금 ${money(r.targetFunds)}에 못 미쳤어요`);
     else if (r.stars < 3) {
       if (r.bigFloods) reasons.push(`대형 침수 ${r.bigFloods}회`);
       if (r.reliefCount) reasons.push(`복구 지원금 ${r.reliefCount}회`);
@@ -499,9 +505,9 @@ export class App {
         <div class="result-stars" data-testid="result-stars">${starsHtml(r.stars)}</div>
         ${reasons.length ? `<p style="text-align:center;color:var(--ink-soft);margin:0">${reasons.join(' · ')}</p>` : ''}
         <table class="result-table">
-          <tr><td>최종 자금</td><td data-testid="result-funds">${won(r.funds)}</td></tr>
-          <tr><td>목표 자금</td><td>${won(r.targetFunds)}</td></tr>
-          <tr><td>총 피해액</td><td>${won(r.totalDamage)}</td></tr>
+          <tr><td>최종 자금</td><td data-testid="result-funds">${money(r.funds)}</td></tr>
+          <tr><td>목표 자금</td><td>${money(r.targetFunds)}</td></tr>
+          <tr><td>총 피해액</td><td>${money(r.totalDamage)}</td></tr>
           <tr><td>붕괴 횟수</td><td>${r.collapses}회</td></tr>
           <tr><td>대형 침수</td><td>${r.bigFloods}회</td></tr>
           <tr><td>용수 계약 충족률</td><td>${Math.round(r.contractRate * 100)}%</td></tr>
@@ -552,8 +558,18 @@ export class App {
     // 시뮬레이션은 느린 기기에서도 실제 시간을 따라가게 1초까지 따라잡고, 연출은 0.1초로 끊는다
     const dt = Math.min(0.1, real);
     const simDt = Math.min(1, real);
-    if (this.screen === 'game' && this.playing && !this.world.finished) {
-      this.tickAcc += simDt * SPEEDS[this.speedIndex] * TICKS_PER_SEC_1X * this.slowmo;
+    // 붕괴 연출 중에는 배속과 상관없이 느리게(멈춤 상태면 멈춘 채로)
+    const rate =
+      this.screen === 'game' && this.playing && !this.world.finished
+        ? this.cine
+          ? SPEEDS[this.speedIndex] > 0
+            ? TICKS_PER_SEC_1X * CINE_SLOWMO
+            : 0
+          : SPEEDS[this.speedIndex] * TICKS_PER_SEC_1X * this.slowmo
+        : 0;
+    this.diorama.simRate = rate;
+    if (rate > 0) {
+      this.tickAcc += simDt * rate;
       let n = Math.floor(this.tickAcc);
       this.tickAcc -= n;
       n = Math.min(n, MAX_TICKS_PER_FRAME);
@@ -611,10 +627,10 @@ export class App {
           this.codexQueue.push({ id: 'sunkenTown', date: formatDate(w.date) });
           break;
         case 'relief':
-          this.pushAlert(`💰 복구 지원금 ${won(e.amount ?? 0)}`, '★★★ 조건에서 감점됩니다', 'info', undefined, e.townId);
+          this.pushAlert(`💰 복구 지원금 ${money(e.amount ?? 0)}`, '★★★ 조건에서 감점됩니다', 'info', undefined, e.townId);
           break;
         case 'emergency':
-          this.pushAlert('🆘 긴급 지원금', '자금이 바닥나 0원까지 메워 받았습니다 (감점)', 'info');
+          this.pushAlert('🆘 긴급 지원금', '자금이 바닥나 0까지 메워 받았습니다 (감점)', 'info');
           break;
         case 'dryRiverbed':
           this.pushAlert(`🏜️ ${siteName} 강바닥이 드러났습니다`, '수위 10% 미만', 'warn', e.siteId);
@@ -687,9 +703,11 @@ export class App {
     if (this.screen !== 'game') return;
     const c = this.diorama.camera.position;
     const t = this.diorama.controls.target;
-    this.cine = { siteId, t: 0, phase: 0, camPos: { x: c.x, y: c.y, z: c.z }, camTarget: { x: t.x, y: t.y, z: t.z } };
-    this.slowmo = 0.3;
-    this.diorama.focusSite(siteId, 58);
+    this.cine = { siteId, t: 0, phase: 0, camPos: { x: c.x, y: c.y, z: c.z }, camTarget: { x: t.x, y: t.y, z: t.z }, sprayT: 0 };
+    const s = this.world.sites.find((x) => x.def.id === siteId)!;
+    // 장난감 영상처럼 하류 쪽 낮은 곳에서 터지는 댐을 올려다본다
+    this.diorama.snapshotDepth();
+    this.diorama.cineLook(siteId, { x: s.cx, y: s.cy }, 10, 6, 3.5);
     this.diorama.splash(siteId);
     this.hud.classList.add('letterbox');
     const name = this.world.sites.find((s) => s.def.id === siteId)?.def.name ?? '';
@@ -700,17 +718,51 @@ export class App {
   private updateCinematic(dt: number): void {
     const c = this.cine!;
     c.t += dt;
-    if (c.phase === 0 && c.t > 1.6) {
+    const s = this.world.sites.find((x) => x.def.id === c.siteId)!;
+    const front = this.diorama.floodFront(c.siteId) ?? { x: s.cx, y: s.cy };
+    // 하류 첫 마을: 물마루가 닿으면 장난감 마을이 휩쓸리는 장면을 붙잡고 있는다
+    const town = this.downstreamTown(s);
+    const along = (p: { x: number; y: number }) => (s.def.flow === 'E' ? p.x : s.def.flow === 'S' ? p.y : -p.y);
+    if (town && c.phase < 2 && along(front) >= along({ x: town.x0, y: town.def.y }) - 2) c.phase = 2;
+    if (c.phase === 2 && town) {
+      // 마을 건너편 낮은 곳에서 강 쪽을 바라본다 (물이 장난감 쪽으로 밀려온다)
+      const away = town.def.riverSide === 'N' ? 1 : -1;
+      const riverEdgeY = town.def.riverSide === 'N' ? town.y0 : town.y0 + town.def.h - 1;
+      this.diorama.cineLookAt(
+        { x: town.def.x - 2, y: riverEdgeY },
+        { x: town.def.x + 6, y: riverEdgeY + away * (town.def.h + 7) },
+        4.5,
+      );
+    } else if (c.t > 2) {
+      // 쏟아지는 물마루를 앞질러 가며 비춘다
       c.phase = 1;
-      const s = this.world.sites.find((x) => x.def.id === c.siteId)!;
-      const dx = s.def.flow === 'E' ? 22 : 0;
-      const dy = s.def.flow === 'S' ? 18 : s.def.flow === 'N' ? -18 : 0;
-      this.diorama.focusCell(Math.min(this.world.terrain.w - 8, s.cx + dx), s.cy + dy, 64, 2.2);
+      this.diorama.cineLook(c.siteId, front, 9, 6, 4);
     }
-    if (c.t > 4.2) this.endCinematic();
+    c.sprayT -= dt;
+    if (c.sprayT <= 0) {
+      c.sprayT = 0.12;
+      const g = this.world.grid;
+      const at = (x: number, y: number) => {
+        const i = Math.round(y) * this.world.terrain.w + Math.round(x);
+        return this.diorama.cellToWorld(x, y, g.ground[i] + g.depth[i]);
+      };
+      this.diorama.burst(at(s.cx + (s.def.flow === 'E' ? 1 : 0), s.cy + (s.def.flow === 'S' ? 1 : 0)), 30, 1.2);
+      if (c.phase === 1) this.diorama.burst(at(front.x, front.y), 25, 0.9);
+    }
+    if (c.t > CINE_SECONDS) this.endCinematic();
+  }
+
+  private downstreamTown(s: { cx: number; cy: number; def: { flow: string } }) {
+    let best: (typeof this.world.townLayouts)[number] | null = null;
+    for (const l of this.world.townLayouts) {
+      const down = s.def.flow === 'E' ? l.def.x > s.cx : l.def.x > s.cx - 10 && l.def.y > s.cy;
+      if (down && (!best || l.def.x < best.def.x)) best = l;
+    }
+    return best;
   }
 
   private endCinematic(): void {
+    this.diorama.endCine();
     if (this.cine) this.diorama.tweenCamera(this.cine.camPos, this.cine.camTarget, 1.2);
     this.cine = null;
     this.slowmo = 1;
@@ -798,7 +850,7 @@ export class App {
     this.setText('date', `${formatDate(d)} ${String(d.hour).padStart(2, '0')}시`);
     const r = w.today.rain;
     this.setText('weather', r <= 0 ? '☀️ 맑음' : r < 1 ? '🌦️ 약한 비' : r < 2.5 ? '🌧️ 비' : '⛈️ 폭우');
-    this.setText('funds', won(w.economy.funds));
+    this.setText('funds', money(w.economy.funds));
     const trust = w.towns.reduce((a, t) => a + t.trust, 0) / Math.max(1, w.towns.length);
     this.setText('trust', `${trust < 40 ? '😟' : trust < 70 ? '🙂' : '😊'} ${Math.round(trust)}`);
     this.updatePanel();
@@ -883,6 +935,7 @@ export class App {
       sp.style.bottom = `${dam.autoSetpoint * 100}%`;
       sp.classList.toggle('hidden', !(dam.autoEnabled && dam.levels.auto > 0));
     }
+    this.updateTrend(dam.siteId, lv);
     this.setPanelText('level-text', `${Math.round(lv * 100)}%${dam.overtopping ? ' 🌊월류!' : ''}`);
     const maxD = maxDurability(dam);
     const dp = dam.durability / maxD;
@@ -902,7 +955,27 @@ export class App {
     const rep = this.panelEl.querySelector<HTMLButtonElement>('[data-p=repair]')!;
     const rc = repairCost(dam);
     rep.disabled = rc <= 0 || funds < rc;
-    rep.textContent = rc > 0 ? `🔧 보수 ${won(rc)}` : '🔧 튼튼함';
+    rep.textContent = rc > 0 ? `🔧 보수 ${money(rc)}` : '🔧 튼튼함';
+  }
+
+  private trendState: { siteId: string; tick: number; level: number; rate: number } | null = null;
+
+  /** 수위가 시간당 얼마나 오르내리는지 (수문 미세 조정용) */
+  private updateTrend(siteId: string, level: number): void {
+    const tick = this.world.tick;
+    let st = this.trendState;
+    if (!st || st.siteId !== siteId) st = this.trendState = { siteId, tick, level, rate: 0 };
+    if (tick - st.tick >= 3) {
+      const r = (level - st.level) / (tick - st.tick);
+      st.rate = st.rate * 0.5 + r * 0.5;
+      st.tick = tick;
+      st.level = level;
+    }
+    const pct = st.rate * 100;
+    const txt = Math.abs(pct) < 0.05 ? '수위 유지 ━' : pct > 0 ? `시간당 ▲ ${pct.toFixed(1)}%` : `시간당 ▼ ${(-pct).toFixed(1)}%`;
+    this.setPanelText('trend', txt);
+    const el = this.panelEl.querySelector<HTMLElement>('[data-b=trend]');
+    if (el) el.className = `trend ${Math.abs(pct) < 0.05 ? '' : pct > 0 ? 'up' : 'down'}`;
   }
 
   private setPanelText(key: string, text: string): void {
@@ -917,9 +990,9 @@ export class App {
         const st = METHODS[m];
         const feat = m === 'earth' ? '싸지만 월류에 매우 약함' : m === 'stone' ? '균형형' : `발전 효율 +${Math.round((st.powerEfficiency - 1) * 100)}%`;
         return `<button class="card ${this.chosenMethod === m ? 'sel' : ''}" data-method="${m}" data-testid="method-${m}">
-          <div class="t"><span>${st.name}</span><span>${won(buildCost(s.def, m))}</span></div>
+          <div class="t"><span>${st.name}</span><span>${money(buildCost(s.def, m))}</span></div>
           <div class="d">내구도 ${st.baseDurability} · 업그레이드 최대 ${st.maxUpgrade}단계</div>
-          <div class="d">${feat} · 월 유지비 ${won(st.upkeepPerMonth)}</div>
+          <div class="d">${feat} · 월 유지비 ${money(st.upkeepPerMonth)}</div>
         </button>`;
       })
       .join('');
@@ -945,7 +1018,7 @@ export class App {
       return `<button class="close" data-p="close">✕</button>
         <h3>💥 ${s.def.name}</h3><div class="sub">${m.name} · 무너짐</div>
         <p style="font-size:13px">댐이 무너졌습니다. 같은 공법과 업그레이드로 다시 쌓을 수 있어요.</p>
-        <button class="btn warn" style="width:100%" data-p="rebuild" data-testid="rebuild">재건 ${won(rebuildCost(s.def, dam.method))}</button>`;
+        <button class="btn warn" style="width:100%" data-p="rebuild" data-testid="rebuild">재건 ${money(rebuildCost(s.def, dam.method))}</button>`;
     }
     const ups = UPGRADE_AXES.map((a: UpgradeAxis) => {
       const lvl = dam.levels[a];
@@ -958,7 +1031,7 @@ export class App {
         if (m < 1) warn = `<div class="warn">⚠ 더 높이면 상류 마을이 역류로 잠길 수 있어요</div>`;
       }
       return `<div class="upg"><div>${UPGRADE_NAMES[a]} <span class="pips">${pips}</span>${warn}</div>
-        <button class="btn small" data-up="${a}" data-testid="upgrade-${a}">${can ? won(upgradeCost(s.def, dam, a)) : '최대'}</button></div>`;
+        <button class="btn small" data-up="${a}" data-testid="upgrade-${a}">${can ? money(upgradeCost(s.def, dam, a)) : '최대'}</button></div>`;
     }).join('');
     const auto =
       dam.levels.auto > 0
@@ -979,6 +1052,20 @@ export class App {
       </div>
       <div class="section-title">수문 방류율 <span data-b="gate-text"></span></div>
       <input class="slider" type="range" min="0" max="100" step="1" value="${Math.round(dam.gate * 100)}" data-p="gate" data-testid="gate-slider">
+      <div class="stepper">
+        <button class="btn small" data-step="-10" data-testid="gate-minus10">−10</button>
+        <button class="btn small" data-step="-1" data-testid="gate-minus1">−1</button>
+        <span class="trend" data-b="trend"></span>
+        <button class="btn small" data-step="1" data-testid="gate-plus1">+1</button>
+        <button class="btn small" data-step="10" data-testid="gate-plus10">+10</button>
+      </div>
+      <div class="presets">
+        <button class="btn small" data-set="0">닫기</button>
+        <button class="btn small" data-set="25">25</button>
+        <button class="btn small" data-set="50">50</button>
+        <button class="btn small" data-set="75">75</button>
+        <button class="btn small" data-set="100">활짝</button>
+      </div>
       ${auto}
       <div class="section-title">업그레이드</div>
       <div class="upgrades">${ups}</div>
@@ -998,34 +1085,48 @@ export class App {
     const up = t.closest<HTMLElement>('[data-up]')?.dataset.up as UpgradeAxis | undefined;
     if (up) {
       const r = this.world.upgrade(id, up);
-      this.toast(r.ok ? `${UPGRADE_NAMES[up]} 업그레이드 (−${won(r.cost ?? 0)})` : r.reason ?? '');
+      this.toast(r.ok ? `${UPGRADE_NAMES[up]} 업그레이드 (−${money(r.cost ?? 0)})` : r.reason ?? '');
+      return;
+    }
+    const step = t.closest<HTMLElement>('[data-step]')?.dataset.step;
+    const preset = t.closest<HTMLElement>('[data-set]')?.dataset.set;
+    if (step !== undefined || preset !== undefined) {
+      const d = this.world.dam(id);
+      if (!d) return;
+      const pct = preset !== undefined ? Number(preset) : Math.round(d.gate * 100) + Number(step);
+      this.changeGate(id, pct / 100);
       return;
     }
     const p = t.closest<HTMLElement>('[data-p]')?.dataset.p;
     if (p === 'close') this.selectSite(null);
     if (p === 'build') {
       const r = this.world.build(id, this.chosenMethod);
-      this.toast(r.ok ? `${METHODS[this.chosenMethod].name} 건설 완료 (−${won(r.cost ?? 0)})` : r.reason ?? '');
+      this.toast(r.ok ? `${METHODS[this.chosenMethod].name} 건설 완료 (−${money(r.cost ?? 0)})` : r.reason ?? '');
       this.handleEvents(this.world.drainEvents());
     }
     if (p === 'repair') {
       const r = this.world.repair(id);
-      this.toast(r.ok ? `보수 완료 (−${won(r.cost ?? 0)})` : r.reason ?? '');
+      this.toast(r.ok ? `보수 완료 (−${money(r.cost ?? 0)})` : r.reason ?? '');
     }
     if (p === 'rebuild') {
       const r = this.world.rebuild(id);
-      this.toast(r.ok ? `재건 완료 (−${won(r.cost ?? 0)})` : r.reason ?? '');
+      this.toast(r.ok ? `재건 완료 (−${money(r.cost ?? 0)})` : r.reason ?? '');
     }
+  }
+
+  private changeGate(id: string, v: number): void {
+    this.world.setGate(id, v);
+    const slider = this.panelEl.querySelector<HTMLInputElement>('[data-p=gate]');
+    const d = this.world.dam(id);
+    if (slider && d) slider.value = String(Math.round(d.gate * 100));
+    if (this.tutorialStep === 1) this.advanceTutorial(2);
   }
 
   private onPanelInput(e: Event): void {
     const t = e.target as HTMLInputElement;
     const id = this.selected;
     if (!id) return;
-    if (t.dataset.p === 'gate') {
-      this.world.setGate(id, Number(t.value) / 100);
-      if (this.tutorialStep === 1) this.advanceTutorial(2);
-    }
+    if (t.dataset.p === 'gate') this.changeGate(id, Number(t.value) / 100);
     if (t.dataset.p === 'auto') this.world.setAuto(id, t.checked);
     if (t.dataset.p === 'autosp') {
       const d = this.world.dam(id);
@@ -1047,6 +1148,10 @@ export class App {
       },
       get inCinematic() {
         return app.inCinematic;
+      },
+      /** 지금 물에 떠내려가는 물건 수 */
+      get floating() {
+        return app.diorama.floatingCount;
       },
       topView() {
         app.diorama.camera.position.set(0, 170, 1);
